@@ -76,7 +76,10 @@ the range with a proxy filter on the leader's best-run level
   SavedVariables on `/reload`
 
 The widget's right-click menu holds the same toggles plus dungeon selection and
-a skin section (scale, font size, background and border colors).
+"Skin options...", a window with sliders and color swatches for box size, font
+size, corner radius in percent (50% on a square box = circle) and background,
+border and text colors. While it is open the widget shows a corner grip for
+drag-resizing. The widget follows WoW's own UI scale.
 
 A keybind mirroring the widget click is under Options → Keybindings → AddOns.
 

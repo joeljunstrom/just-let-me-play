@@ -47,28 +47,6 @@ local function handleDungeons(rest)
   end
 end
 
-local function pickColor(key)
-  local defaults = key == "bg" and ns.Widget.DEFAULT_BG or ns.Widget.DEFAULT_BORDER
-  local original = ns.db.skin[key]
-  local current = original or defaults
-  local function apply()
-    local r, g, b = ColorPickerFrame:GetColorRGB()
-    ns.db.skin[key] = { r, g, b, ColorPickerFrame:GetColorAlpha() }
-    ns.Widget:ApplySkin()
-  end
-  ColorPickerFrame:SetupColorPickerAndShow({
-    r = current[1], g = current[2], b = current[3],
-    opacity = current[4],
-    hasOpacity = true,
-    swatchFunc = apply,
-    opacityFunc = apply,
-    cancelFunc = function()
-      ns.db.skin[key] = original
-      ns.Widget:ApplySkin()
-    end,
-  })
-end
-
 local function handleRole(rest)
   if rest == "auto" or rest == "" then
     ns.db.roleOverride = nil
@@ -201,31 +179,8 @@ function Config:OpenMenu(owner)
       ns.db.useBlizzardSearchBox = not ns.db.useBlizzardSearchBox
     end)
 
-    local skin = root:CreateButton("Skin")
-    skin:CreateTitle("Scale")
-    for _, preset in ipairs({ { "75%", 0.75 }, { "100%", 1 }, { "125%", 1.25 }, { "150%", 1.5 } }) do
-      skin:CreateRadio(preset[1], function()
-        return (ns.db.skin.scale or 1) == preset[2]
-      end, function()
-        ns.db.skin.scale = preset[2] ~= 1 and preset[2] or nil
-        ns.Widget:ApplySkin()
-      end)
-    end
-    skin:CreateTitle("Font size")
-    for _, preset in ipairs({ { "Small", 12 }, { "Default", nil }, { "Large", 20 }, { "Huge", 24 } }) do
-      skin:CreateRadio(preset[1], function()
-        return ns.db.skin.fontSize == preset[2]
-      end, function()
-        ns.db.skin.fontSize = preset[2]
-        ns.Widget:ApplySkin()
-      end)
-    end
-    skin:CreateTitle("Colors")
-    skin:CreateButton("Background...", function() pickColor("bg") end)
-    skin:CreateButton("Border...", function() pickColor("border") end)
-    skin:CreateButton("Reset skin", function()
-      wipe(ns.db.skin)
-      ns.Widget:ApplySkin()
+    root:CreateButton("Skin options...", function()
+      ns.Options:Toggle()
     end)
 
     local dungeons = root:CreateButton("Dungeons")

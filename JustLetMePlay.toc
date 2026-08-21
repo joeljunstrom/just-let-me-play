@@ -13,3 +13,4 @@ Search.lua
 Apply.lua
 Notify.lua
 Widget.lua
+Options.lua
