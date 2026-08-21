@@ -5,7 +5,7 @@ ns.Widget = Widget
 
 Widget.DEFAULT_BG = { 0.07, 0.07, 0.09, 0.95 }
 Widget.DEFAULT_BORDER = { 0.45, 0.45, 0.5, 0.9 }
-Widget.DEFAULT_WIDTH = 76
+Widget.DEFAULT_WIDTH = 50
 Widget.DEFAULT_COUNT_SIZE = 14
 Widget.DEFAULT_RADIUS = 12
 Widget.DEFAULT_BORDER_WIDTH = 2
@@ -231,7 +231,8 @@ function Widget:ApplySkin()
 
   -- Box follows the fonts unless the user set an explicit size (grip drag or
   -- the size sliders). No SetScale: the widget follows WoW's own UI scale.
-  local width = skin.width or math.max(Widget.DEFAULT_WIDTH, countSize * 5)
+  -- Defaults land at 50x45 with the 14pt font and track the font from there.
+  local width = skin.width or math.max(Widget.DEFAULT_WIDTH, math.floor(countSize * 3.6))
   local height = skin.height or (countSize + labelSize + gap + 20)
   frame:SetSize(width, height)
   frame:SetResizeBounds(24, 24, 400, 400)
