@@ -27,7 +27,7 @@ on longest, and blacklists that group for the session. Handy when a leader lets
 you hang and you'd rather chase a fresh group.
 
 The widget stays hidden until you have something to search for: text in
-Blizzard's M+ search box, or dungeons picked with `/jlmp dungeons`. It shows
+Blizzard's M+ search box, or dungeons picked from the right-click menu. It shows
 `n/5` active applications, glows when there are results to apply to,
 and its tooltip lists active applications with time left plus the next scored
 picks. Drag to move, right-click for options. When a slot frees up (declined or
@@ -60,7 +60,8 @@ the range with a proxy filter on the leader's best-run level
 
 `/jlmp` in chat:
 
-- `/jlmp dungeons [list|add <id>|remove <id>|clear]`: restrict to specific dungeons
+- `/jlmp dungeons [add <id>|remove <id>|clear]`: restrict to specific dungeons,
+  or pick them from the widget's right-click menu
 - `/jlmp role tank|healer|dps|any|auto`: role used when applying (auto = current spec)
 - `/jlmp levels <min>-<max>|off`: target key levels (scoring tiebreak + raw-mode filter)
 - `/jlmp sounds on|off`

@@ -10,25 +10,28 @@ local function say(msg)
   print("|cff33ff99JustLetMePlay|r: " .. msg)
 end
 
-local function listDungeons()
-  local activities = C_LFGList.GetAvailableActivities(GROUP_FINDER_CATEGORY_DUNGEONS)
-  if not activities or #activities == 0 then
-    say("No activities available yet (open the Group Finder once).")
-    return
-  end
-  for _, id in ipairs(activities) do
+-- Menu source: only M+ listings when the client flags them, otherwise the
+-- category is hundreds of heroics/timewalking entries nobody can scroll.
+local function dungeonMenuEntries()
+  local all, mplus = {}, {}
+  for _, id in ipairs(C_LFGList.GetAvailableActivities(GROUP_FINDER_CATEGORY_DUNGEONS) or {}) do
     local info = C_LFGList.GetActivityInfoTable(id)
-    local name = info and (info.fullName or info.shortName) or "?"
-    local marker = ns.db.activityIDs[id] and " |cff33ff99(selected)|r" or ""
-    say(("%d - %s%s"):format(id, name, marker))
+    if info then
+      local entry = { id = id, name = info.fullName or info.shortName or tostring(id) }
+      all[#all + 1] = entry
+      if info.isMythicPlusActivity then
+        mplus[#mplus + 1] = entry
+      end
+    end
   end
+  local entries = #mplus > 0 and mplus or all
+  table.sort(entries, function(a, b) return a.name < b.name end)
+  return entries
 end
 
 local function handleDungeons(rest)
   local action, idText = rest:match("^(%S*)%s*(.-)$")
-  if action == "" or action == "list" then
-    listDungeons()
-  elseif action == "clear" then
+  if action == "clear" then
     wipe(ns.db.activityIDs)
     say("Dungeon filter cleared (searching all).")
   elseif action == "add" or action == "remove" then
@@ -40,7 +43,7 @@ local function handleDungeons(rest)
     ns.db.activityIDs[id] = (action == "add") and true or nil
     say(("Activity %d %s."):format(id, action == "add" and "added" or "removed"))
   else
-    say("Usage: /jlmp dungeons [list|add <id>|remove <id>|clear]")
+    say("Usage: /jlmp dungeons [add <id>|remove <id>|clear] - or pick from the right-click menu")
   end
 end
 
@@ -79,7 +82,7 @@ end
 
 local function showHelp()
   say("commands:")
-  say("/jlmp dungeons [list|add <id>|remove <id>|clear] - pick dungeons")
+  say("/jlmp dungeons [add <id>|remove <id>|clear] - or pick from the right-click menu")
   say("/jlmp role tank|healer|dps|any|auto - role for applications")
   say("/jlmp levels <min>-<max>|off - target key levels")
   say("/jlmp sounds on|off")
@@ -176,8 +179,23 @@ function Config:OpenMenu(owner)
       ns.db.useBlizzardSearchBox = not ns.db.useBlizzardSearchBox
     end)
 
-    root:CreateButton("Dungeon list (chat)", function()
-      listDungeons()
-    end)
+    local dungeons = root:CreateButton("Dungeons")
+    local entries = dungeonMenuEntries()
+    if #entries == 0 then
+      dungeons:CreateTitle("Open the Group Finder once to load")
+    else
+      for _, entry in ipairs(entries) do
+        dungeons:CreateCheckbox(entry.name, function()
+          return ns.db.activityIDs[entry.id]
+        end, function()
+          ns.db.activityIDs[entry.id] = not ns.db.activityIDs[entry.id] or nil
+          ns.Widget:Refresh()
+        end)
+      end
+      dungeons:CreateButton("Clear all", function()
+        wipe(ns.db.activityIDs)
+        ns.Widget:Refresh()
+      end)
+    end
   end)
 end
