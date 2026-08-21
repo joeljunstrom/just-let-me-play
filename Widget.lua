@@ -212,14 +212,14 @@ function Widget:ApplySkin()
   frame.count:SetFont(frame.fontPath, countSize, "")
   frame.label:SetFont(frame.fontPath, labelSize, "")
 
-  -- Text hugs the middle: count above center, label below, with a gap that
-  -- grows with the font.
+  -- Center the count+gap+label block as a whole: the count is taller than
+  -- the label, so anchoring both an equal distance from center rides high.
   local gap = math.max(2, math.floor(countSize / 5))
-  frame.textGap = gap / 2
+  frame.textGap = (labelSize + gap - countSize) / 2
   frame.count:ClearAllPoints()
   frame.count:SetPoint("BOTTOM", frame, "CENTER", 0, frame.textGap)
   frame.label:ClearAllPoints()
-  frame.label:SetPoint("TOP", frame, "CENTER", 0, -frame.textGap)
+  frame.label:SetPoint("TOP", frame, "CENTER", 0, frame.textGap - gap)
 
   -- Box follows the fonts unless the user set an explicit size (grip drag or
   -- the size sliders). No SetScale: the widget follows WoW's own UI scale.
