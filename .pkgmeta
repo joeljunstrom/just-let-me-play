@@ -1,0 +1,9 @@
+package-as: JustLetMePlay
+
+ignore:
+  - AGENTS.md
+  - CURSEFORGE.md
+  - README.md
+  - logo.png
+  - .luacheckrc
+  - .gitattributes
