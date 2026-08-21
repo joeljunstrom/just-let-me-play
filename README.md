@@ -67,6 +67,8 @@ the range with a proxy filter on the leader's best-run level
 - `/jlmp mode blizzard|raw`: search through Blizzard's box or the raw API
 - `/jlmp autocancel on|off`: on your next click, drop applications where the
   group delisted or your role filled up (on by default)
+- `/jlmp show always|auto`: keep the widget visible even without a search;
+  clicking it then opens the Group Finder so you can type one
 - `/jlmp debug on|off`: troubleshooting log (off wipes it), written to
   SavedVariables on `/reload`
 

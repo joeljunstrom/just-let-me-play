@@ -21,6 +21,7 @@ local defaults = {
   useBlizzardSearchBox = true,
   debugEnabled = false,
   autoCancel = true,
+  alwaysShow = false,
 }
 
 function Core:InitDB()

@@ -116,7 +116,8 @@ function Widget:Refresh()
 
   -- Stay hidden until there is something meaningful to search for; keep
   -- showing while applications or scored results are still live.
-  if not ns.Search:HasSearchContext() and active == 0 and #ns.results == 0 then
+  if not ns.db.alwaysShow and not ns.Search:HasSearchContext()
+    and active == 0 and #ns.results == 0 then
     frame:Hide()
     return
   end
