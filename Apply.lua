@@ -18,6 +18,7 @@ end
 function Apply:StillEligible(id)
   local info = C_LFGList.GetSearchResultInfo(id)
   if not info or info.isDelisted then return false end
+  if not ns.Search:MatchesDungeonFilter(info) then return false end
   if ns.sessionDeclined[id] then return false end
   if ns.pendingApplies[id] then return false end
   if not ns.Search:RoleHasSpace(id) then return false end

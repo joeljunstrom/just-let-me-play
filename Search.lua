@@ -111,8 +111,21 @@ function Search:RoleHasSpace(id)
   return self:NeedsRole(id, self:MyRole())
 end
 
+-- The dungeon checkboxes must hold on both search paths: the raw path passes
+-- them to C_LFGList.Search, but the Blizzard-box path returns whatever the
+-- typed text matches, so filter results here too.
+function Search:MatchesDungeonFilter(info)
+  if not next(ns.db.activityIDs) then return true end
+  if info.activityID and ns.db.activityIDs[info.activityID] then return true end
+  for _, id in ipairs(info.activityIDs or {}) do
+    if ns.db.activityIDs[id] then return true end
+  end
+  return false
+end
+
 function Search:Eligible(id, info)
   if info.isDelisted then return false end
+  if not self:MatchesDungeonFilter(info) then return false end
   if ns.sessionDeclined[id] then return false end
   if ns.pendingApplies[id] then return false end
   if not self:RoleHasSpace(id) then return false end
