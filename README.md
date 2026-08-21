@@ -65,6 +65,5 @@ A keybind mirroring the widget click is under Options → Keybindings → AddOns
 ## Status
 
 Working — verified in-game: the Blizzard-box search path retains the typed key
-range with no taint, and applying from the widget works. `SPIKE.md` tracks the
-remaining API assumptions. Applications cannot be auto-cancelled (also
-protected); they expire naturally.
+range with no taint, and applying from the widget works. Applications cannot be
+auto-cancelled (also protected); they expire naturally.

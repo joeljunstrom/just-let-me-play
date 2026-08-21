@@ -2,8 +2,7 @@
 
 Retail WoW addon that keeps you queued for Mythic+ in the Premade Group Finder
 with two clicks instead of constant babysitting. Repo root **is** the addon
-folder; it is symlinked as
-`/Applications/World of Warcraft/_retail_/Interface/AddOns/JustLetMePlay`.
+folder; symlink it as `<WoW>/_retail_/Interface/AddOns/JustLetMePlay`.
 
 ## Hard API constraints (everything follows from these)
 
@@ -44,17 +43,20 @@ State lives on the shared addon namespace `ns` (second vararg of each file).
 
 - No build step. Edit → in-game `/reload` → test. The symlink makes repo edits
   live on next reload.
-- Syntax check locally: `/opt/homebrew/bin/luajit -bl <file>.lua`
-  (Lua 5.1 == WoW's dialect). Run over every .lua before committing.
+- Syntax check locally: `luajit -bl <file>.lua` (Lua 5.1 == WoW's dialect).
+  Run over every .lua before committing.
 - **Debug loop**: `/jlmp debug on` (off by default; off wipes the log), then
   the addon logs actions/searches/applies/status changes to
   `JustLetMePlayDB.debugLog`. SavedVariables flush on `/reload` or logout, then
-  read
-  `/Applications/World of Warcraft/_retail_/WTF/Account/JOELJUNSTROM/SavedVariables/JustLetMePlay.lua`.
+  read `<WoW>/_retail_/WTF/Account/<ACCOUNT>/SavedVariables/JustLetMePlay.lua`.
   Log lines: `HH:MM:SS [tag] key=value…` with tags
   `action|search|results|pick|apply|app|debug`.
-- `SPIKE.md` holds the in-game verification checklist and which API
-  assumptions are confirmed vs open.
+- Verified in-game: `LFGListSearchPanel_DoSearch` retains the search-box text
+  taint-free; raw 7-arg `C_LFGList.Search` works; `ApplyToGroup`,
+  `GetApplicationInfo` order, and `leaderDungeonScoreInfo.bestRunLevel` behave
+  as coded. Still unverified: `GetSearchResultMemberCounts` key names
+  (assumed `TANK`/`HEALER`/`DAMAGER`) and whether the slot-freed sound choice
+  is pleasant.
 - TOC `## Interface` must track current retail (120100 = 12.1.x); bump when
   the client updates or the addon shows as out of date.
 
