@@ -23,6 +23,7 @@ local defaults = {
   debugEnabled = false,
   autoCancel = true,
   alwaysShow = false,
+  skin = {},
 }
 
 function Core:InitDB()

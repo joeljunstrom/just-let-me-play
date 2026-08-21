@@ -73,6 +73,9 @@ the range with a proxy filter on the leader's best-run level
 - `/jlmp debug on|off`: troubleshooting log (off wipes it), written to
   SavedVariables on `/reload`
 
+The widget's right-click menu holds the same toggles plus dungeon selection and
+a skin section (scale, font size, background and border colors).
+
 A keybind mirroring the widget click is under Options → Keybindings → AddOns.
 
 ## Releasing

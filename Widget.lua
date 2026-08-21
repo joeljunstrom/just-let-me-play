@@ -3,6 +3,9 @@ local _, ns = ...
 local Widget = {}
 ns.Widget = Widget
 
+Widget.DEFAULT_BG = { 0.06, 0.06, 0.09, 0.9 }
+Widget.DEFAULT_BORDER = { 0.35, 0.35, 0.4, 0.9 }
+
 local frame
 
 local function savePosition()
@@ -34,9 +37,6 @@ function Widget:Init()
     edgeSize = 1,
     insets = { left = 1, right = 1, top = 1, bottom = 1 },
   })
-  frame:SetBackdropColor(0.06, 0.06, 0.09, 0.9)
-  frame:SetBackdropBorderColor(0.35, 0.35, 0.4, 0.9)
-
   frame.count = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
   frame.count:SetPoint("TOP", 0, -6)
   frame.label = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -89,7 +89,25 @@ function Widget:Init()
   end
 
   restorePosition()
+  self:ApplySkin()
   self:Refresh()
+end
+
+function Widget:ApplySkin()
+  if not frame then return end
+  local skin = ns.db.skin
+  frame:SetScale(skin.scale or 1)
+  frame:SetBackdropColor(unpack(skin.bg or Widget.DEFAULT_BG))
+  if skin.fontSize then
+    local countPath = frame.count:GetFont()
+    frame.count:SetFont(countPath, skin.fontSize, "")
+    local labelPath = frame.label:GetFont()
+    frame.label:SetFont(labelPath, math.max(6, skin.fontSize - 6), "")
+  else
+    frame.count:SetFontObject("GameFontNormalLarge")
+    frame.label:SetFontObject("GameFontHighlightSmall")
+  end
+  self:SetGlow(frame.glow:IsShown())
 end
 
 function Widget:SetGlow(show)
@@ -99,7 +117,7 @@ function Widget:SetGlow(show)
   else
     frame.pulse:Stop()
     frame.glow:Hide()
-    frame:SetBackdropBorderColor(0.35, 0.35, 0.4, 0.9)
+    frame:SetBackdropBorderColor(unpack(ns.db.skin.border or Widget.DEFAULT_BORDER))
   end
 end
 
