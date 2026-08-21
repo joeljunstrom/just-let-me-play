@@ -146,9 +146,16 @@ function Widget:Refresh()
     return
   end
   frame:Show()
-  frame.count:SetText(("%d/%d"):format(active, ns.MAX_APPLICATIONS))
+  -- Denominator is what this search can actually reach: applications out plus
+  -- results left to apply to, capped at the server's 5. "3/3" after a search
+  -- that found three groups, not a forever-unreachable "3/5".
+  local reachable = math.min(ns.MAX_APPLICATIONS, active + #ns.results)
+  if reachable == 0 then
+    reachable = ns.MAX_APPLICATIONS
+  end
+  frame.count:SetText(("%d/%d"):format(active, reachable))
 
-  if active >= ns.MAX_APPLICATIONS then
+  if active >= reachable then
     frame.count:SetTextColor(0.4, 0.9, 0.45)
   elseif active > 0 then
     frame.count:SetTextColor(1, 0.85, 0.3)

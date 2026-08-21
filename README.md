@@ -28,7 +28,9 @@ you hang and you'd rather chase a fresh group.
 
 The widget stays hidden until you have something to search for: text in
 Blizzard's M+ search box, or dungeons picked from the right-click menu. It shows
-`n/5` active applications, glows when there are results to apply to,
+`n/m` where m is what the current search can reach (results found plus
+applications out, capped at the server's 5), glows when there are results to
+apply to,
 and its tooltip lists active applications with time left plus the next scored
 picks. Drag to move, right-click for options. When a slot frees up (declined or
 expired application) you get a quiet sound and a glow; when results go stale
