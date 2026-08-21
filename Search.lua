@@ -73,6 +73,15 @@ function Search:RawSearch()
   end
 end
 
+-- Group titles are opaque kstrings the client sometimes fails to resolve
+-- (renders as "Unknown"), so display the dungeon's activity name instead.
+function Search:ActivityName(info)
+  local activityID = info.activityID or (info.activityIDs and info.activityIDs[1])
+  if not activityID then return nil end
+  local activity = C_LFGList.GetActivityInfoTable(activityID)
+  return activity and (activity.shortName ~= "" and activity.shortName or activity.fullName) or nil
+end
+
 function Search:LeaderBestRun(info)
   local score = info.leaderDungeonScoreInfo
   if not score then return nil end
@@ -151,7 +160,7 @@ function Search:CollectAndScore()
     if info and self:Eligible(id, info) then
       ns.results[#ns.results + 1] = id
       ns.resultInfo[id] = {
-        name = info.name,
+        name = self:ActivityName(info) or info.name,
         age = info.age or 0,
         bestRunLevel = self:LeaderBestRun(info),
         needsMyRole = self:NeedsRole(id, role),
