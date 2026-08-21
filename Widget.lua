@@ -6,7 +6,9 @@ ns.Widget = Widget
 Widget.DEFAULT_BG = { 0.06, 0.06, 0.09, 0.9 }
 Widget.DEFAULT_BORDER = { 0.35, 0.35, 0.4, 0.9 }
 Widget.DEFAULT_WIDTH = 72
-Widget.DEFAULT_COUNT_SIZE = 16
+Widget.DEFAULT_COUNT_SIZE = 14
+Widget.DEFAULT_RADIUS = 10
+Widget.DEFAULT_BORDER_WIDTH = 2
 
 local GLOW_BORDER = { 0.3, 0.75, 0.35, 1 }
 local GLOW_FILL = { 0.2, 0.8, 0.3, 0.15 }
@@ -217,8 +219,11 @@ function Widget:ApplySkin()
 
   -- Center the count+gap+label block as a whole: the count is taller than
   -- the label, so anchoring both an equal distance from center rides high.
+  -- Line heights beat point sizes here; ascent/descent varies per face.
+  local countH = frame.count:GetLineHeight()
+  local labelH = frame.label:GetLineHeight()
   local gap = math.max(2, math.floor(countSize / 5))
-  frame.textGap = (labelSize + gap - countSize) / 2
+  frame.textGap = (labelH + gap - countH) / 2
   frame.count:ClearAllPoints()
   frame.count:SetPoint("BOTTOM", frame, "CENTER", 0, frame.textGap)
   frame.label:ClearAllPoints()
@@ -233,11 +238,14 @@ function Widget:ApplySkin()
 
   -- Radius is a percentage of the short side: 50% is a pill, and a circle
   -- on a square box, whatever the size.
-  local pct = math.min(skin.radius or 0, 50)
+  local pct = math.min(skin.radius or Widget.DEFAULT_RADIUS, 50)
   local radius = math.floor(math.min(width, height) * pct / 100 + 0.5)
+  local borderWidth = skin.borderWidth or Widget.DEFAULT_BORDER_WIDTH
+  frame.bgShape.inset = borderWidth
+  frame.glowShape.inset = borderWidth
   frame.borderShape:SetRadius(radius)
-  frame.bgShape:SetRadius(math.max(0, radius - 1))
-  frame.glowShape:SetRadius(math.max(0, radius - 1))
+  frame.bgShape:SetRadius(math.max(0, radius - borderWidth))
+  frame.glowShape:SetRadius(math.max(0, radius - borderWidth))
 
   local bg = skin.bg or Widget.DEFAULT_BG
   frame.bgShape:SetColor(bg[1], bg[2], bg[3], bg[4])

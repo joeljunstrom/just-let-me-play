@@ -221,9 +221,16 @@ local function build()
   end))
 
   place(makeSlider("Corner radius %", 0, 50, 1, function()
-    return skin.radius or 0
+    return skin.radius or ns.Widget.DEFAULT_RADIUS
   end, function(v)
-    skin.radius = v > 0 and v or nil
+    skin.radius = v ~= ns.Widget.DEFAULT_RADIUS and v or nil
+    ns.Widget:ApplySkin()
+  end))
+
+  place(makeSlider("Border width", 0, 8, 1, function()
+    return skin.borderWidth or ns.Widget.DEFAULT_BORDER_WIDTH
+  end, function(v)
+    skin.borderWidth = v ~= ns.Widget.DEFAULT_BORDER_WIDTH and v or nil
     ns.Widget:ApplySkin()
   end))
 
