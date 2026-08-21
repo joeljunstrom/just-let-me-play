@@ -32,6 +32,7 @@ function Core:InitDB()
     end
   end
   ns.db = JustLetMePlayDB
+  ns.Debug:StartSession()
 end
 
 function Core:ActiveApplicationCount()
@@ -53,6 +54,7 @@ end
 -- must only be reached from a click or keybind call stack, never from a timer
 -- or event handler.
 function Core:OnHardwareAction()
+  ns.Debug:Log("action", ("state=%s results=%d free=%d"):format(ns.state, #ns.results, self:FreeSlots()))
   if ns.state == "SEARCHED" and #ns.results > 0 and self:FreeSlots() > 0 then
     ns.Apply:ApplyTop()
   else
@@ -72,6 +74,7 @@ local DECLINE_STATUSES = {
 }
 
 function Core:OnApplicationUpdate(id, newStatus)
+  ns.Debug:Log("app", ("id=%s status=%s active=%d"):format(tostring(id), tostring(newStatus), self:ActiveApplicationCount()))
   if DECLINE_STATUSES[newStatus] then
     ns.sessionDeclined[id] = true
   end
@@ -105,6 +108,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
     ns.state = "SEARCHED"
     ns.Widget:Refresh()
   elseif event == "LFG_LIST_SEARCH_FAILED" then
+    ns.Debug:Log("search", "failed: " .. tostring(...))
     ns.pendingSearch = false
     ns.state = "IDLE"
     ns.Widget:Flash("Throttled")

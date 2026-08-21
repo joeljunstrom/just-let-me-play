@@ -32,7 +32,8 @@ function Apply:ApplyTop()
   for _, id in ipairs(ns.results) do
     if self:StillEligible(id) then
       if free > 0 then
-        C_LFGList.ApplyToGroup(id, tank, healer, dps)
+        local ok, err = pcall(C_LFGList.ApplyToGroup, id, tank, healer, dps)
+        ns.Debug:Log("apply", ("id=%s ok=%s%s"):format(tostring(id), tostring(ok), err and (" err=" .. tostring(err)) or ""))
         free = free - 1
       else
         remaining[#remaining + 1] = id

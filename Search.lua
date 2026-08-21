@@ -28,9 +28,12 @@ function Search:Trigger()
   ns.pendingSearch = true
   if ns.db.useBlizzardSearchBox and blizzardPanelUsable() then
     ns.lastSearchPath = "blizzard"
+    local boxText = LFGListFrame.SearchPanel.SearchBox and LFGListFrame.SearchPanel.SearchBox:GetText() or "?"
+    ns.Debug:Log("search", "trigger path=blizzard boxText=" .. boxText)
     LFGListSearchPanel_DoSearch(LFGListFrame.SearchPanel)
   else
     ns.lastSearchPath = "raw"
+    ns.Debug:Log("search", "trigger path=raw (panelUsable=" .. tostring(blizzardPanelUsable() or false) .. ")")
     self:RawSearch()
   end
 end
@@ -45,7 +48,8 @@ function Search:RawSearch()
   end
   -- Search arity has shifted across patches; fall back to the minimal call if
   -- the full modern signature is rejected.
-  local ok = pcall(C_LFGList.Search, GROUP_FINDER_CATEGORY_DUNGEONS, 0, 0, nil, nil, nil, ids)
+  local ok, err = pcall(C_LFGList.Search, GROUP_FINDER_CATEGORY_DUNGEONS, 0, 0, nil, nil, nil, ids)
+  ns.Debug:Log("search", "raw 7-arg ok=" .. tostring(ok) .. (err and (" err=" .. tostring(err)) or ""))
   if not ok then
     C_LFGList.Search(GROUP_FINDER_CATEGORY_DUNGEONS)
   end
@@ -115,6 +119,8 @@ function Search:CollectAndScore()
     end
   end
 
+  ns.Debug:Log("results", ("total=%d eligible=%d role=%s"):format(#ids, #ns.results, role))
+
   local targetMid = self:TargetMid()
   table.sort(ns.results, function(a, b)
     local ia, ib = ns.resultInfo[a], ns.resultInfo[b]
@@ -135,6 +141,14 @@ function Search:CollectAndScore()
     end
     return ia.age < ib.age
   end)
+
+  for rank = 1, math.min(5, #ns.results) do
+    local id = ns.results[rank]
+    local entry = ns.resultInfo[id]
+    ns.Debug:Log("pick", ("#%d id=%s name=%s age=%d bestRun=%s needsRole=%s"):format(
+      rank, tostring(id), tostring(entry.name), entry.age,
+      tostring(entry.bestRunLevel), tostring(entry.needsMyRole)))
+  end
 
   ns.searchedAt = GetTime()
 end

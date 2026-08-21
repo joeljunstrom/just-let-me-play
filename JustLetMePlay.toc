@@ -6,6 +6,7 @@
 ## SavedVariables: JustLetMePlayDB
 ## Category: Group Finder
 
+Debug.lua
 Core.lua
 Config.lua
 Search.lua
