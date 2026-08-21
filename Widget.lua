@@ -3,11 +3,11 @@ local _, ns = ...
 local Widget = {}
 ns.Widget = Widget
 
-Widget.DEFAULT_BG = { 0.06, 0.06, 0.09, 0.9 }
-Widget.DEFAULT_BORDER = { 0.35, 0.35, 0.4, 0.9 }
-Widget.DEFAULT_WIDTH = 72
+Widget.DEFAULT_BG = { 0.07, 0.07, 0.09, 0.95 }
+Widget.DEFAULT_BORDER = { 0.45, 0.45, 0.5, 0.9 }
+Widget.DEFAULT_WIDTH = 76
 Widget.DEFAULT_COUNT_SIZE = 14
-Widget.DEFAULT_RADIUS = 10
+Widget.DEFAULT_RADIUS = 22
 Widget.DEFAULT_BORDER_WIDTH = 2
 
 local GLOW_BORDER = { 0.3, 0.75, 0.35, 1 }
@@ -222,7 +222,7 @@ function Widget:ApplySkin()
   -- Line heights beat point sizes here; ascent/descent varies per face.
   local countH = frame.count:GetLineHeight()
   local labelH = frame.label:GetLineHeight()
-  local gap = math.max(2, math.floor(countSize / 5))
+  local gap = math.max(3, math.floor(countSize / 4))
   frame.textGap = (labelH + gap - countH) / 2
   frame.count:ClearAllPoints()
   frame.count:SetPoint("BOTTOM", frame, "CENTER", 0, frame.textGap)
@@ -231,8 +231,8 @@ function Widget:ApplySkin()
 
   -- Box follows the fonts unless the user set an explicit size (grip drag or
   -- the size sliders). No SetScale: the widget follows WoW's own UI scale.
-  local width = skin.width or math.max(Widget.DEFAULT_WIDTH, countSize * 4.5)
-  local height = skin.height or (countSize + labelSize + gap + 14)
+  local width = skin.width or math.max(Widget.DEFAULT_WIDTH, countSize * 5)
+  local height = skin.height or (countSize + labelSize + gap + 20)
   frame:SetSize(width, height)
   frame:SetResizeBounds(24, 24, 400, 400)
 
