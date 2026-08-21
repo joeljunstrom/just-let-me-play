@@ -150,7 +150,7 @@ function Widget:Refresh()
   elseif free > 0 and ns.Search:HasSearchContext() then
     frame.label:SetText("Search")
     frame.label:SetTextColor(1, 0.85, 0.3)
-    self:SetGlow(true)
+    self:SetGlow(false)
   elseif free > 0 then
     frame.label:SetText("Set search")
     frame.label:SetTextColor(0.6, 0.6, 0.6)
