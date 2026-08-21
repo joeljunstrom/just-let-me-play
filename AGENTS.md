@@ -64,5 +64,5 @@ State lives on the shared addon namespace `ns` (second vararg of each file).
 
 - Very few comments; only non-obvious constraints (mostly the
   hardware-event/taint rules above).
-- Conventional commit messages, no AI-attribution trailers. Push to
-  `origin main` (github.com/joeljunstrom/just-let-me-play).
+- Plain commit messages: no feat:/fix:/docs: prefixes, no AI-attribution
+  trailers. Push to `origin main` (github.com/joeljunstrom/just-let-me-play).
