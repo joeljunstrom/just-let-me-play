@@ -29,11 +29,16 @@ function Search:HasSearchContext()
   return not ns.db.useBlizzardSearchBox and ns.db.targetLevelMin ~= nil
 end
 
+-- The Blizzard path only filters through the typed box text, so an empty box
+-- would run a wide-open search; require text and fall back to raw otherwise.
 local function blizzardPanelUsable()
   local panel = LFGListFrame and LFGListFrame.SearchPanel
-  return panel
-    and panel.categoryID == GROUP_FINDER_CATEGORY_DUNGEONS
-    and LFGListSearchPanel_DoSearch ~= nil
+  if not (panel and panel.categoryID == GROUP_FINDER_CATEGORY_DUNGEONS
+    and LFGListSearchPanel_DoSearch) then
+    return false
+  end
+  local text = panel.SearchBox and panel.SearchBox:GetText() or ""
+  return text ~= ""
 end
 
 -- Hardware-event context only: C_LFGList.Search is protected.
