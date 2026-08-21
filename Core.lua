@@ -106,6 +106,8 @@ function Core:OnApplicationUpdate(id, newStatus)
 end
 
 function Core:CheckStale()
+  ns.Widget:Refresh()
+  if not ns.Search:HasSearchContext() then return end
   if self:ActiveApplicationCount() >= ns.MAX_APPLICATIONS then return end
   if not ns.searchedAt or GetTime() - ns.searchedAt > 60 then
     ns.Notify:Stale()

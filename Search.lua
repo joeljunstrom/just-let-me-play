@@ -16,6 +16,18 @@ function Search:MyRole()
   return role or "DAMAGER"
 end
 
+-- A search context exists when the user has set up what they want: typed
+-- something in Blizzard's M+ search box, or configured dungeons via /jlmp.
+-- Without one, searching would apply to arbitrary groups.
+function Search:HasSearchContext()
+  local panel = LFGListFrame and LFGListFrame.SearchPanel
+  if panel and panel.categoryID == GROUP_FINDER_CATEGORY_DUNGEONS then
+    local text = panel.SearchBox and panel.SearchBox:GetText() or ""
+    if text ~= "" then return true end
+  end
+  return next(ns.db.activityIDs) ~= nil
+end
+
 local function blizzardPanelUsable()
   local panel = LFGListFrame and LFGListFrame.SearchPanel
   return panel

@@ -77,6 +77,15 @@ function Widget:Init()
     GameTooltip:Hide()
   end)
 
+  local panel = LFGListFrame and LFGListFrame.SearchPanel
+  if panel then
+    panel:HookScript("OnShow", function() Widget:Refresh() end)
+    panel:HookScript("OnHide", function() Widget:Refresh() end)
+    if panel.SearchBox then
+      panel.SearchBox:HookScript("OnTextChanged", function() Widget:Refresh() end)
+    end
+  end
+
   restorePosition()
   self:Refresh()
 end
@@ -102,6 +111,14 @@ function Widget:Refresh()
   if not frame then return end
   local active = math.min(ns.MAX_APPLICATIONS,
     ns.Core:ActiveApplicationCount() + ns.Core:PendingApplyCount())
+
+  -- Stay hidden until there is something meaningful to search for; keep
+  -- showing while applications or scored results are still live.
+  if not ns.Search:HasSearchContext() and active == 0 and #ns.results == 0 then
+    frame:Hide()
+    return
+  end
+  frame:Show()
   frame.count:SetText(("%d/%d"):format(active, ns.MAX_APPLICATIONS))
 
   if active >= ns.MAX_APPLICATIONS then
