@@ -4,3 +4,4 @@ README.md export-ignore
 logo.png export-ignore
 .luacheckrc export-ignore
 .gitattributes export-ignore
+LICENSE export-ignore
