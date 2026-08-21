@@ -19,6 +19,7 @@ local defaults = {
   activityIDs = {},
   sounds = true,
   useBlizzardSearchBox = true,
+  debugEnabled = false,
 }
 
 function Core:InitDB()

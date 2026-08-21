@@ -46,7 +46,8 @@ State lives on the shared addon namespace `ns` (second vararg of each file).
   live on next reload.
 - Syntax check locally: `/opt/homebrew/bin/luajit -bl <file>.lua`
   (Lua 5.1 == WoW's dialect). Run over every .lua before committing.
-- **Debug loop**: the addon logs actions/searches/applies/status changes to
+- **Debug loop**: `/jlmp debug on` (off by default; off wipes the log), then
+  the addon logs actions/searches/applies/status changes to
   `JustLetMePlayDB.debugLog`. SavedVariables flush on `/reload` or logout, then
   read
   `/Applications/World of Warcraft/_retail_/WTF/Account/JOELJUNSTROM/SavedVariables/JustLetMePlay.lua`.

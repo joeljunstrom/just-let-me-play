@@ -84,6 +84,7 @@ local function showHelp()
   say("/jlmp levels <min>-<max>|off - target key levels")
   say("/jlmp sounds on|off")
   say("/jlmp mode blizzard|raw - search via Blizzard's box (keeps typed range) or raw API")
+  say("/jlmp debug on|off - action log for troubleshooting")
 end
 
 local function handle(msg)
@@ -98,6 +99,12 @@ local function handle(msg)
   elseif cmd == "sounds" then
     ns.db.sounds = rest ~= "off"
     say("Sounds " .. (ns.db.sounds and "on" or "off") .. ".")
+  elseif cmd == "debug" then
+    ns.db.debugEnabled = rest == "on"
+    if not ns.db.debugEnabled then
+      ns.db.debugLog = nil
+    end
+    say("Debug logging " .. (ns.db.debugEnabled and "on (flushed to SavedVariables on /reload)" or "off (log wiped)") .. ".")
   elseif cmd == "mode" then
     if rest == "blizzard" or rest == "raw" then
       ns.db.useBlizzardSearchBox = rest == "blizzard"
