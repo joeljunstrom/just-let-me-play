@@ -62,6 +62,22 @@ the range with a proxy filter on the leader's best-run level
 
 A keybind mirroring the widget click is under Options → Keybindings → AddOns.
 
+## Releasing to CurseForge
+
+1. Bump `## Version` in `JustLetMePlay.toc`, commit.
+2. Build the release zip (`.gitattributes` keeps dev files out):
+
+   ```
+   git archive --format=zip --prefix=JustLetMePlay/ -o ../JustLetMePlay.zip HEAD
+   ```
+
+3. Upload manually on CurseForge: game version = current retail, paste the
+   changelog. Don't use the GitHub-sync option — one pipeline only.
+
+The zip must contain the `JustLetMePlay/` folder (matching the .toc name), not
+loose files — `git archive` with the prefix handles that. Never zip via Finder;
+it adds `__MACOSX`/`._` junk.
+
 ## Status
 
 Working — verified in-game: the Blizzard-box search path retains the typed key
