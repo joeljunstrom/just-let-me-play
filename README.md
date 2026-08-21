@@ -74,21 +74,24 @@ the range with a proxy filter on the leader's best-run level
 
 A keybind mirroring the widget click is under Options → Keybindings → AddOns.
 
-## Releasing to CurseForge
+## Releasing
 
-1. Bump `## Version` in `JustLetMePlay.toc`, commit.
-2. Build the release zip (`.gitattributes` keeps dev files out):
+CurseForge packages automatically via a webhook on this repo (`.pkgmeta`
+controls the folder name and which files ship). The TOC version is stamped
+from the git tag (`@project-version@`), so a release is just:
 
-   ```
-   git archive --format=zip --prefix=JustLetMePlay/ -o ../JustLetMePlay.zip HEAD
-   ```
+```
+git tag -a vX.Y.Z -m "short note"
+git push origin main --tags
+```
 
-3. Upload manually on CurseForge: game version = current retail, paste the
-   changelog. Don't use the GitHub-sync option; one pipeline only.
+Every untagged push builds an alpha file on CurseForge; tags build releases
+(a tag containing "beta" or "alpha" is marked as such). No manual zips.
+For a GitHub release mirror: `git archive --format=zip --prefix=JustLetMePlay/
+-o ../JustLetMePlay.zip vX.Y.Z` and attach with `gh release create`.
 
-The zip must contain the `JustLetMePlay/` folder (matching the .toc name), not
-loose files. `git archive` with the prefix handles that. Never zip via Finder;
-it adds `__MACOSX`/`._` junk.
+Locally the addon list shows the literal `@project-version@`; that's the
+packager token, only CurseForge builds get the real version.
 
 ## Status
 

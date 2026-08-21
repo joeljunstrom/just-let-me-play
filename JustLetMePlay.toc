@@ -2,7 +2,7 @@
 ## Title: JustLetMePlay
 ## Notes: Low-effort Mythic+ Premade Group Finder queueing
 ## Author: Joel Junström
-## Version: 0.4.2
+## Version: @project-version@
 ## SavedVariables: JustLetMePlayDB
 ## Category: Group Finder
 
