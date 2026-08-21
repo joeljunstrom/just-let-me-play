@@ -14,6 +14,7 @@ ns.sessionDeclined = {}
 ns.pendingApplies = {}
 ns.pendingSearch = false
 ns.lastSearchPath = "blizzard"
+ns.joinedGroup = false
 
 local defaults = {
   activityIDs = {},
@@ -143,6 +144,7 @@ end
 
 function Core:CheckStale()
   ns.Widget:Refresh()
+  if ns.joinedGroup then return end
   if not ns.Search:HasSearchContext() then return end
   if self:ActiveApplicationCount() >= ns.MAX_APPLICATIONS then return end
   if not ns.searchedAt or GetTime() - ns.searchedAt > 60 then
@@ -156,10 +158,12 @@ frame:RegisterEvent("LFG_LIST_SEARCH_RESULTS_RECEIVED")
 frame:RegisterEvent("LFG_LIST_SEARCH_FAILED")
 frame:RegisterEvent("LFG_LIST_APPLICATION_STATUS_UPDATED")
 frame:RegisterEvent("GROUP_JOINED")
+frame:RegisterEvent("GROUP_LEFT")
 
 frame:SetScript("OnEvent", function(_, event, ...)
   if event == "PLAYER_LOGIN" then
     Core:InitDB()
+    ns.joinedGroup = IsInGroup() and not UnitIsGroupLeader("player")
     ns.Widget:Init()
     C_Timer.NewTicker(15, function() Core:CheckStale() end)
   elseif event == "LFG_LIST_SEARCH_RESULTS_RECEIVED" then
@@ -184,6 +188,12 @@ frame:SetScript("OnEvent", function(_, event, ...)
   elseif event == "GROUP_JOINED" then
     ns.state = "IDLE"
     wipe(ns.results)
+    -- Leader check separates "accepted an invite into someone's group" (hide,
+    -- the run is on) from "formed my own premade to keep applying" (stay).
+    ns.joinedGroup = not UnitIsGroupLeader("player")
+    ns.Widget:Refresh()
+  elseif event == "GROUP_LEFT" then
+    ns.joinedGroup = false
     ns.Widget:Refresh()
   end
 end)

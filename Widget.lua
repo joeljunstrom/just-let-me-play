@@ -114,6 +114,12 @@ function Widget:Refresh()
   local active = math.min(ns.MAX_APPLICATIONS,
     ns.Core:ActiveApplicationCount() + ns.Core:PendingApplyCount())
 
+  -- Get out of the way once the player has joined a group; alwaysShow wins.
+  if ns.joinedGroup and not ns.db.alwaysShow then
+    frame:Hide()
+    return
+  end
+
   -- Stay hidden until there is something meaningful to search for; keep
   -- showing while applications or scored results are still live.
   if not ns.db.alwaysShow and not ns.Search:HasSearchContext()
