@@ -51,15 +51,17 @@ end
 
 -- Applications sent this session that the server has not yet confirmed via
 -- LFG_LIST_APPLICATION_STATUS_UPDATED; without this a second click within the
--- confirmation window applies past the 5-cap. Confirmation lands in 1-3s, so a
--- pending entry older than 5s means the server silently ignored the apply
--- (full group, delisted) and it must not inflate the count.
+-- confirmation window applies past the 5-cap. Confirmation lands within ~1s in
+-- practice, so a pending entry older than 3s means the server silently ignored
+-- the apply (full group, delisted) and it must not inflate the count. Worst
+-- case on a laggy realm the count dips early and the server's own cap rejects
+-- the extra apply, which is harmless.
 function Core:PendingApplyCount()
   local now = GetTime()
   local count = 0
   for id, sentAt in pairs(ns.pendingApplies) do
     local _, appStatus = C_LFGList.GetApplicationInfo(id)
-    if (appStatus and appStatus ~= "none") or now - sentAt > 5 then
+    if (appStatus and appStatus ~= "none") or now - sentAt > 3 then
       ns.pendingApplies[id] = nil
     else
       count = count + 1
@@ -86,6 +88,14 @@ function Core:OnHardwareAction()
   else
     ns.Search:Trigger()
   end
+  ns.Widget:Refresh()
+  C_Timer.After(6, function() ns.Widget:Refresh() end)
+end
+
+-- Same hardware-event rule as OnHardwareAction: one cancel per click.
+function Core:OnUnsignAction()
+  ns.Debug:Log("action", "unsign requested")
+  ns.Apply:CancelOldest()
   ns.Widget:Refresh()
   C_Timer.After(6, function() ns.Widget:Refresh() end)
 end

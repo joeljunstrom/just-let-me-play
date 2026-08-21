@@ -51,6 +51,24 @@ function Apply:CancelOneDead()
   return false
 end
 
+-- FIFO unsign: cancel the application closest to timing out, i.e. the one
+-- you've waited on longest. Session-blacklisted so the next apply skips it.
+function Apply:CancelOldest()
+  local oldestID, leastTimeLeft
+  for _, id in ipairs(C_LFGList.GetApplications()) do
+    local _, appStatus, _, appDuration = C_LFGList.GetApplicationInfo(id)
+    if appStatus == "applied" and appDuration then
+      if not leastTimeLeft or appDuration < leastTimeLeft then
+        oldestID, leastTimeLeft = id, appDuration
+      end
+    end
+  end
+  if not oldestID then return end
+  ns.sessionDeclined[oldestID] = true
+  local ok = pcall(C_LFGList.CancelApplication, oldestID)
+  ns.Debug:Log("unsign", ("id=%s ok=%s"):format(tostring(oldestID), tostring(ok)))
+end
+
 function Apply:ApplyNext()
   local tank, healer, dps = roleFlags()
   while #ns.results > 0 do
