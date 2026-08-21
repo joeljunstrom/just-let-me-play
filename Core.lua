@@ -90,15 +90,23 @@ function Core:OnHardwareAction()
     ns.Search:Trigger()
   else
     -- Nothing sane to search for (empty box after a /reload, no configured
-    -- dungeons); searching now would apply to random groups. Open the panel
-    -- so the user can type their range instead.
-    if PVEFrame_ToggleFrame then
-      PVEFrame_ToggleFrame("GroupFinderFrame")
-    end
+    -- dungeons); searching now would apply to random groups. Navigate to the
+    -- premade dungeons search panel so the user can type their range.
+    self:OpenDungeonSearchPanel()
     print("|cff33ff99JustLetMePlay|r: type your search (e.g. |cffffff7810-12|r) in the Group Finder box first.")
   end
   ns.Widget:Refresh()
   C_Timer.After(6, function() ns.Widget:Refresh() end)
+end
+
+function Core:OpenDungeonSearchPanel()
+  if not PVEFrame_ShowFrame then return end
+  pcall(PVEFrame_ShowFrame, "GroupFinderFrame", "LFGListPVEStub")
+  local category = LFGListFrame and LFGListFrame.CategorySelection
+  if category and LFGListCategorySelection_SelectCategory and LFGListCategorySelection_StartFindGroup then
+    pcall(LFGListCategorySelection_SelectCategory, category, 2, 0)
+    pcall(LFGListCategorySelection_StartFindGroup, category)
+  end
 end
 
 -- Same hardware-event rule as OnHardwareAction: one cancel per click.
@@ -155,8 +163,10 @@ frame:SetScript("OnEvent", function(_, event, ...)
     ns.Widget:Init()
     C_Timer.NewTicker(15, function() Core:CheckStale() end)
   elseif event == "LFG_LIST_SEARCH_RESULTS_RECEIVED" then
-    -- The event can fire twice in the same frame; collect once.
-    if ns.lastResultsAt == GetTime() then return end
+    -- Fires for every search, including manual and empty-box ones in the
+    -- Blizzard UI; only collect results from searches we triggered, or the
+    -- apply queue fills with unfiltered groups. Can fire twice per search.
+    if not ns.pendingSearch or ns.lastResultsAt == GetTime() then return end
     ns.lastResultsAt = GetTime()
     ns.pendingSearch = false
     ns.Search:CollectAndScore()
