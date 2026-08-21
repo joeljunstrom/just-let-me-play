@@ -91,8 +91,8 @@ function Core:OnHardwareAction()
   elseif ns.Search:HasSearchContext() then
     ns.Search:Trigger()
   else
-    -- Nothing sane to search for (empty box after a /reload, no configured
-    -- dungeons); searching now would apply to random groups. Navigate to the
+    -- No key-level source (empty box after a /reload, no /jlmp levels);
+    -- searching now would apply to keys of any level. Navigate to the
     -- premade dungeons search panel so the user can type their range.
     self:OpenDungeonSearchPanel()
     print("|cff33ff99JustLetMePlay|r: type your search (e.g. |cffffff7810-12|r) in the Group Finder box first.")
