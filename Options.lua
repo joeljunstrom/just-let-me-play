@@ -91,6 +91,76 @@ local function makeSwatch(label, get, set, hasOpacity)
   return holder
 end
 
+-- Built-in faces always exist; LibSharedMedia fonts are added when another
+-- addon ships the library.
+local function fontList()
+  local fonts = {
+    { name = "Friz Quadrata", path = "Fonts\\FRIZQT__.TTF" },
+    { name = "Arial Narrow", path = "Fonts\\ARIALN.TTF" },
+    { name = "Morpheus", path = "Fonts\\MORPHEUS.ttf" },
+    { name = "Skurri", path = "Fonts\\skurri.ttf" },
+  }
+  local lsm = LibStub and LibStub:GetLibrary("LibSharedMedia-3.0", true)
+  if lsm then
+    local seen = {}
+    for _, font in ipairs(fonts) do
+      seen[font.path] = true
+    end
+    for _, name in ipairs(lsm:List("font")) do
+      local path = lsm:Fetch("font", name, true)
+      if path and not seen[path] then
+        seen[path] = true
+        fonts[#fonts + 1] = { name = name, path = path }
+      end
+    end
+    table.sort(fonts, function(a, b) return a.name < b.name end)
+  end
+  return fonts
+end
+
+local function makeFontRow()
+  local holder = CreateFrame("Frame", nil, panel)
+  holder:SetSize(240, 24)
+
+  local title = holder:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+  title:SetPoint("LEFT")
+  title:SetText("Font")
+
+  local button = CreateFrame("Button", nil, holder, "UIPanelButtonTemplate")
+  button:SetSize(150, 22)
+  button:SetPoint("RIGHT")
+
+  local skin = ns.db.skin
+  local function select(name, path)
+    skin.font = path
+    skin.fontName = name
+    holder.refresh()
+    ns.Widget:ApplySkin()
+  end
+
+  button:SetScript("OnClick", function()
+    MenuUtil.CreateContextMenu(button, function(_, root)
+      root:CreateRadio("Default (game font)", function()
+        return skin.font == nil
+      end, function()
+        select(nil, nil)
+      end)
+      for _, font in ipairs(fontList()) do
+        root:CreateRadio(font.name, function()
+          return skin.font == font.path
+        end, function()
+          select(font.name, font.path)
+        end)
+      end
+    end)
+  end)
+
+  holder.refresh = function()
+    button:SetText(skin.font and (skin.fontName or "Custom") or "Default")
+  end
+  return holder
+end
+
 local controls = {}
 
 local function build()

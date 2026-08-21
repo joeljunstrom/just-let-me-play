@@ -209,8 +209,11 @@ function Widget:ApplySkin()
   local skin = ns.db.skin
   local countSize = skin.fontSize or Widget.DEFAULT_COUNT_SIZE
   local labelSize = math.max(6, countSize - 6)
-  frame.count:SetFont(frame.fontPath, countSize, "")
-  frame.label:SetFont(frame.fontPath, labelSize, "")
+  -- frame.fontPath was read off the template at Init, so with no override the
+  -- widget follows the game font, including font-replacement addons.
+  local fontPath = skin.font or frame.fontPath
+  frame.count:SetFont(fontPath, countSize, "")
+  frame.label:SetFont(fontPath, labelSize, "")
 
   -- Center the count+gap+label block as a whole: the count is taller than
   -- the label, so anchoring both an equal distance from center rides high.
