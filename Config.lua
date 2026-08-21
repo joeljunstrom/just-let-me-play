@@ -84,6 +84,7 @@ local function showHelp()
   say("/jlmp levels <min>-<max>|off - target key levels")
   say("/jlmp sounds on|off")
   say("/jlmp mode blizzard|raw - search via Blizzard's box (keeps typed range) or raw API")
+  say("/jlmp autocancel on|off - drop applications when the group delists or your role fills")
   say("/jlmp debug on|off - action log for troubleshooting")
 end
 
@@ -99,6 +100,9 @@ local function handle(msg)
   elseif cmd == "sounds" then
     ns.db.sounds = rest ~= "off"
     say("Sounds " .. (ns.db.sounds and "on" or "off") .. ".")
+  elseif cmd == "autocancel" then
+    ns.db.autoCancel = rest ~= "off"
+    say("Auto-cancel " .. (ns.db.autoCancel and "on" or "off") .. " (runs on your next widget click).")
   elseif cmd == "debug" then
     ns.db.debugEnabled = rest == "on"
     if not ns.db.debugEnabled then
@@ -146,6 +150,12 @@ function Config:OpenMenu(owner)
       return ns.db.sounds
     end, function()
       ns.db.sounds = not ns.db.sounds
+    end)
+
+    root:CreateCheckbox("Auto-cancel dead applications", function()
+      return ns.db.autoCancel
+    end, function()
+      ns.db.autoCancel = not ns.db.autoCancel
     end)
 
     root:CreateCheckbox("Use Blizzard search box", function()

@@ -20,6 +20,7 @@ local defaults = {
   sounds = true,
   useBlizzardSearchBox = true,
   debugEnabled = false,
+  autoCancel = true,
 }
 
 function Core:InitDB()
@@ -50,13 +51,15 @@ end
 
 -- Applications sent this session that the server has not yet confirmed via
 -- LFG_LIST_APPLICATION_STATUS_UPDATED; without this a second click within the
--- confirmation window applies past the 5-cap.
+-- confirmation window applies past the 5-cap. Confirmation lands in 1-3s, so a
+-- pending entry older than 5s means the server silently ignored the apply
+-- (full group, delisted) and it must not inflate the count.
 function Core:PendingApplyCount()
   local now = GetTime()
   local count = 0
   for id, sentAt in pairs(ns.pendingApplies) do
     local _, appStatus = C_LFGList.GetApplicationInfo(id)
-    if (appStatus and appStatus ~= "none") or now - sentAt > 15 then
+    if (appStatus and appStatus ~= "none") or now - sentAt > 5 then
       ns.pendingApplies[id] = nil
     else
       count = count + 1
@@ -74,12 +77,14 @@ end
 -- or event handler.
 function Core:OnHardwareAction()
   ns.Debug:Log("action", ("state=%s results=%d free=%d"):format(ns.state, #ns.results, self:FreeSlots()))
+  ns.Apply:CancelDeadApplications()
   if ns.state == "SEARCHED" and #ns.results > 0 and self:FreeSlots() > 0 then
     ns.Apply:ApplyTop()
   else
     ns.Search:Trigger()
   end
   ns.Widget:Refresh()
+  C_Timer.After(6, function() ns.Widget:Refresh() end)
 end
 
 function JustLetMePlay_OnKeybind()

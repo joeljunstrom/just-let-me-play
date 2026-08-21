@@ -20,8 +20,28 @@ function Apply:StillEligible(id)
   if not info or info.isDelisted then return false end
   if ns.sessionDeclined[id] then return false end
   if ns.pendingApplies[id] then return false end
+  if not ns.Search:RoleHasSpace(id) then return false end
   local _, appStatus = C_LFGList.GetApplicationInfo(id)
   return not appStatus or appStatus == "none"
+end
+
+-- Cancel applications that can no longer work out: the group delisted or my
+-- role filled up while the leader lets the application hang. CancelApplication
+-- is hardware-event protected, so this runs inside the widget click.
+function Apply:CancelDeadApplications()
+  if not ns.db.autoCancel then return end
+  for _, id in ipairs(C_LFGList.GetApplications()) do
+    local _, appStatus = C_LFGList.GetApplicationInfo(id)
+    if appStatus == "applied" then
+      local info = C_LFGList.GetSearchResultInfo(id)
+      local dead = (info and info.isDelisted) or not ns.Search:RoleHasSpace(id)
+      if dead then
+        ns.sessionDeclined[id] = true
+        local ok = pcall(C_LFGList.CancelApplication, id)
+        ns.Debug:Log("cancel", ("id=%s ok=%s"):format(tostring(id), tostring(ok)))
+      end
+    end
+  end
 end
 
 -- Hardware-event context only: C_LFGList.ApplyToGroup is protected.

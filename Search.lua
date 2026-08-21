@@ -98,10 +98,18 @@ function Search:NeedsRole(id, role)
   return have < (ROLE_LIMITS[role] or 3)
 end
 
+-- With the ANY override we cannot tell which role the user would fill, so
+-- assume space rather than filtering or cancelling wrongly.
+function Search:RoleHasSpace(id)
+  if ns.db.roleOverride == "ANY" then return true end
+  return self:NeedsRole(id, self:MyRole())
+end
+
 function Search:Eligible(id, info)
   if info.isDelisted then return false end
   if ns.sessionDeclined[id] then return false end
   if ns.pendingApplies[id] then return false end
+  if not self:RoleHasSpace(id) then return false end
   local _, appStatus = C_LFGList.GetApplicationInfo(id)
   if appStatus and appStatus ~= "none" then return false end
   if ns.lastSearchPath == "raw" and not self:PassesProxyFilter(info) then return false end

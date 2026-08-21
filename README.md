@@ -57,6 +57,8 @@ the range with a proxy filter on the leader's best-run level
 - `/jlmp levels <min>-<max>|off`: target key levels (scoring tiebreak + raw-mode filter)
 - `/jlmp sounds on|off`
 - `/jlmp mode blizzard|raw`: search through Blizzard's box or the raw API
+- `/jlmp autocancel on|off`: on your next click, drop applications where the
+  group delisted or your role filled up (on by default)
 - `/jlmp debug on|off`: troubleshooting log (off wipes it), written to
   SavedVariables on `/reload`
 
