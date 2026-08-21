@@ -29,23 +29,27 @@ function Widget:Init()
   frame:RegisterForDrag("LeftButton")
   frame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
   frame:SetBackdrop({
-    bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-    edgeSize = 12,
-    insets = { left = 3, right = 3, top = 3, bottom = 3 },
+    bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
+    edgeFile = "Interface\\Buttons\\WHITE8x8",
+    edgeSize = 1,
+    insets = { left = 1, right = 1, top = 1, bottom = 1 },
   })
-  frame:SetBackdropColor(0, 0, 0, 0.7)
+  frame:SetBackdropColor(0.06, 0.06, 0.09, 0.9)
+  frame:SetBackdropBorderColor(0.35, 0.35, 0.4, 0.9)
 
   frame.count = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-  frame.count:SetPoint("TOP", 0, -5)
+  frame.count:SetPoint("TOP", 0, -6)
   frame.label = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-  frame.label:SetPoint("BOTTOM", 0, 6)
+  frame.label:SetPoint("BOTTOM", 0, 7)
 
   frame.glow = frame:CreateTexture(nil, "BACKGROUND")
-  frame.glow:SetPoint("TOPLEFT", -4, 4)
-  frame.glow:SetPoint("BOTTOMRIGHT", 4, -4)
-  frame.glow:SetColorTexture(0.2, 0.8, 0.2, 0.35)
+  frame.glow:SetPoint("TOPLEFT", 1, -1)
+  frame.glow:SetPoint("BOTTOMRIGHT", -1, 1)
+  frame.glow:SetColorTexture(0.2, 0.8, 0.3, 0.15)
   frame.glow:Hide()
+
+  frame:SetScript("OnMouseDown", function(f) f.count:SetPoint("TOP", 1, -7) end)
+  frame:SetScript("OnMouseUp", function(f) f.count:SetPoint("TOP", 0, -6) end)
 
   frame.pulse = frame.glow:CreateAnimationGroup()
   frame.pulse:SetLooping("BOUNCE")
@@ -80,9 +84,11 @@ end
 function Widget:SetGlow(show)
   if show then
     frame.glow:Show()
+    frame:SetBackdropBorderColor(0.3, 0.75, 0.35, 1)
   else
     frame.pulse:Stop()
     frame.glow:Hide()
+    frame:SetBackdropBorderColor(0.35, 0.35, 0.4, 0.9)
   end
 end
 
@@ -94,21 +100,34 @@ end
 
 function Widget:Refresh()
   if not frame then return end
-  local active = ns.Core:ActiveApplicationCount()
+  local active = math.min(ns.MAX_APPLICATIONS,
+    ns.Core:ActiveApplicationCount() + ns.Core:PendingApplyCount())
   frame.count:SetText(("%d/%d"):format(active, ns.MAX_APPLICATIONS))
+
+  if active >= ns.MAX_APPLICATIONS then
+    frame.count:SetTextColor(0.4, 0.9, 0.45)
+  elseif active > 0 then
+    frame.count:SetTextColor(1, 0.85, 0.3)
+  else
+    frame.count:SetTextColor(0.9, 0.9, 0.9)
+  end
 
   local free = ns.MAX_APPLICATIONS - active
   if ns.pendingSearch then
     frame.label:SetText("Searching...")
+    frame.label:SetTextColor(0.6, 0.6, 0.6)
     self:SetGlow(false)
   elseif ns.state == "SEARCHED" and #ns.results > 0 and free > 0 then
     frame.label:SetText(("Apply %d"):format(math.min(free, #ns.results)))
+    frame.label:SetTextColor(0.4, 0.9, 0.45)
     self:SetGlow(true)
   elseif free > 0 then
     frame.label:SetText("Search")
+    frame.label:SetTextColor(1, 0.85, 0.3)
     self:SetGlow(true)
   else
-    frame.label:SetText("")
+    frame.label:SetText("Queued")
+    frame.label:SetTextColor(0.55, 0.55, 0.6)
     self:SetGlow(false)
   end
 end
@@ -116,6 +135,7 @@ end
 function Widget:Flash(text)
   if not frame then return end
   frame.label:SetText(text)
+  frame.label:SetTextColor(0.95, 0.35, 0.3)
   C_Timer.After(3, function()
     Widget:Refresh()
   end)

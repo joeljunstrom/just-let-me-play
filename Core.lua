@@ -11,6 +11,7 @@ ns.state = "IDLE"
 ns.results = {}
 ns.resultInfo = {}
 ns.sessionDeclined = {}
+ns.pendingApplies = {}
 ns.pendingSearch = false
 ns.lastSearchPath = "blizzard"
 
@@ -46,8 +47,25 @@ function Core:ActiveApplicationCount()
   return count
 end
 
+-- Applications sent this session that the server has not yet confirmed via
+-- LFG_LIST_APPLICATION_STATUS_UPDATED; without this a second click within the
+-- confirmation window applies past the 5-cap.
+function Core:PendingApplyCount()
+  local now = GetTime()
+  local count = 0
+  for id, sentAt in pairs(ns.pendingApplies) do
+    local _, appStatus = C_LFGList.GetApplicationInfo(id)
+    if (appStatus and appStatus ~= "none") or now - sentAt > 15 then
+      ns.pendingApplies[id] = nil
+    else
+      count = count + 1
+    end
+  end
+  return count
+end
+
 function Core:FreeSlots()
-  return ns.MAX_APPLICATIONS - self:ActiveApplicationCount()
+  return math.max(0, ns.MAX_APPLICATIONS - self:ActiveApplicationCount() - self:PendingApplyCount())
 end
 
 -- C_LFGList.Search and ApplyToGroup are hardware-event protected: this function
@@ -71,14 +89,18 @@ local DECLINE_STATUSES = {
   declined = true,
   declined_full = true,
   declined_delisted = true,
+  invitedeclined = true,
 }
 
 function Core:OnApplicationUpdate(id, newStatus)
+  ns.pendingApplies[id] = nil
   ns.Debug:Log("app", ("id=%s status=%s active=%d"):format(tostring(id), tostring(newStatus), self:ActiveApplicationCount()))
   if DECLINE_STATUSES[newStatus] then
     ns.sessionDeclined[id] = true
   end
-  if DECLINE_STATUSES[newStatus] or newStatus == "timedout" then
+  -- invitedeclined is the user actively declining at the keyboard; no sound needed.
+  if newStatus == "declined" or newStatus == "declined_full" or newStatus == "declined_delisted"
+    or newStatus == "timedout" or newStatus == "failed" then
     ns.Notify:SlotFreed()
   end
 end
@@ -103,6 +125,9 @@ frame:SetScript("OnEvent", function(_, event, ...)
     ns.Widget:Init()
     C_Timer.NewTicker(15, function() Core:CheckStale() end)
   elseif event == "LFG_LIST_SEARCH_RESULTS_RECEIVED" then
+    -- The event can fire twice in the same frame; collect once.
+    if ns.lastResultsAt == GetTime() then return end
+    ns.lastResultsAt = GetTime()
     ns.pendingSearch = false
     ns.Search:CollectAndScore()
     ns.state = "SEARCHED"

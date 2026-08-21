@@ -89,6 +89,7 @@ end
 function Search:Eligible(id, info)
   if info.isDelisted then return false end
   if ns.sessionDeclined[id] then return false end
+  if ns.pendingApplies[id] then return false end
   local _, appStatus = C_LFGList.GetApplicationInfo(id)
   if appStatus and appStatus ~= "none" then return false end
   if ns.lastSearchPath == "raw" and not self:PassesProxyFilter(info) then return false end

@@ -19,6 +19,7 @@ function Apply:StillEligible(id)
   local info = C_LFGList.GetSearchResultInfo(id)
   if not info or info.isDelisted then return false end
   if ns.sessionDeclined[id] then return false end
+  if ns.pendingApplies[id] then return false end
   local _, appStatus = C_LFGList.GetApplicationInfo(id)
   return not appStatus or appStatus == "none"
 end
@@ -34,6 +35,9 @@ function Apply:ApplyTop()
       if free > 0 then
         local ok, err = pcall(C_LFGList.ApplyToGroup, id, tank, healer, dps)
         ns.Debug:Log("apply", ("id=%s ok=%s%s"):format(tostring(id), tostring(ok), err and (" err=" .. tostring(err)) or ""))
+        if ok then
+          ns.pendingApplies[id] = GetTime()
+        end
         free = free - 1
       else
         remaining[#remaining + 1] = id
