@@ -1,0 +1,120 @@
+local _, ns = ...
+
+BINDING_HEADER_JUSTLETMEPLAY = "JustLetMePlay"
+BINDING_NAME_JUSTLETMEPLAY_ACTION = "Search / Apply"
+
+local Core = {}
+ns.Core = Core
+
+ns.MAX_APPLICATIONS = 5
+ns.state = "IDLE"
+ns.results = {}
+ns.resultInfo = {}
+ns.sessionDeclined = {}
+ns.pendingSearch = false
+ns.lastSearchPath = "blizzard"
+
+local defaults = {
+  activityIDs = {},
+  sounds = true,
+  useBlizzardSearchBox = true,
+}
+
+function Core:InitDB()
+  JustLetMePlayDB = JustLetMePlayDB or {}
+  for key, value in pairs(defaults) do
+    if JustLetMePlayDB[key] == nil then
+      if type(value) == "table" then
+        JustLetMePlayDB[key] = {}
+      else
+        JustLetMePlayDB[key] = value
+      end
+    end
+  end
+  ns.db = JustLetMePlayDB
+end
+
+function Core:ActiveApplicationCount()
+  local count = 0
+  for _, id in ipairs(C_LFGList.GetApplications()) do
+    local _, appStatus = C_LFGList.GetApplicationInfo(id)
+    if appStatus == "applied" or appStatus == "invited" then
+      count = count + 1
+    end
+  end
+  return count
+end
+
+function Core:FreeSlots()
+  return ns.MAX_APPLICATIONS - self:ActiveApplicationCount()
+end
+
+-- C_LFGList.Search and ApplyToGroup are hardware-event protected: this function
+-- must only be reached from a click or keybind call stack, never from a timer
+-- or event handler.
+function Core:OnHardwareAction()
+  if ns.state == "SEARCHED" and #ns.results > 0 and self:FreeSlots() > 0 then
+    ns.Apply:ApplyTop()
+  else
+    ns.Search:Trigger()
+  end
+  ns.Widget:Refresh()
+end
+
+function JustLetMePlay_OnKeybind()
+  Core:OnHardwareAction()
+end
+
+local DECLINE_STATUSES = {
+  declined = true,
+  declined_full = true,
+  declined_delisted = true,
+}
+
+function Core:OnApplicationUpdate(id, newStatus)
+  if DECLINE_STATUSES[newStatus] then
+    ns.sessionDeclined[id] = true
+  end
+  if DECLINE_STATUSES[newStatus] or newStatus == "timedout" then
+    ns.Notify:SlotFreed()
+  end
+end
+
+function Core:CheckStale()
+  if self:ActiveApplicationCount() >= ns.MAX_APPLICATIONS then return end
+  if not ns.searchedAt or GetTime() - ns.searchedAt > 60 then
+    ns.Notify:Stale()
+  end
+end
+
+local frame = CreateFrame("Frame")
+frame:RegisterEvent("PLAYER_LOGIN")
+frame:RegisterEvent("LFG_LIST_SEARCH_RESULTS_RECEIVED")
+frame:RegisterEvent("LFG_LIST_SEARCH_FAILED")
+frame:RegisterEvent("LFG_LIST_APPLICATION_STATUS_UPDATED")
+frame:RegisterEvent("GROUP_JOINED")
+
+frame:SetScript("OnEvent", function(_, event, ...)
+  if event == "PLAYER_LOGIN" then
+    Core:InitDB()
+    ns.Widget:Init()
+    C_Timer.NewTicker(15, function() Core:CheckStale() end)
+  elseif event == "LFG_LIST_SEARCH_RESULTS_RECEIVED" then
+    ns.pendingSearch = false
+    ns.Search:CollectAndScore()
+    ns.state = "SEARCHED"
+    ns.Widget:Refresh()
+  elseif event == "LFG_LIST_SEARCH_FAILED" then
+    ns.pendingSearch = false
+    ns.state = "IDLE"
+    ns.Widget:Flash("Throttled")
+  elseif event == "LFG_LIST_APPLICATION_STATUS_UPDATED" then
+    local id, newStatus = ...
+    Core:OnApplicationUpdate(id, newStatus)
+    ns.Widget:Refresh()
+  elseif event == "GROUP_JOINED" then
+    ns.state = "IDLE"
+    wipe(ns.results)
+    ns.Widget:Refresh()
+  end
+end)

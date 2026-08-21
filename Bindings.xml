@@ -1,0 +1,5 @@
+<Bindings>
+  <Binding name="JUSTLETMEPLAY_ACTION" category="ADDONS">
+    JustLetMePlay_OnKeybind()
+  </Binding>
+</Bindings>
