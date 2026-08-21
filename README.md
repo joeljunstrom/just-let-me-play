@@ -12,12 +12,15 @@ keybind):
 
 1. **Click 1 — Search.** Triggers a Group Finder search. Results are scored:
    groups that need your role first, then freshest listings, then leader
-   best-run level closest to your target range. Already-applied groups and
-   groups that declined you this session are skipped.
+   best-run level closest to your target range. Already-applied groups, groups
+   that declined you, and groups whose invite you declined this session are
+   skipped.
 2. **Click 2 — Apply.** Applies to the top-scored groups until you have 5
    active applications.
 
-The widget shows `n/5` active applications, glows when an action is available,
+The widget stays hidden until there is something to search for — text in
+Blizzard's M+ search box or dungeons configured via `/jlmp dungeons`. It shows
+`n/5` active applications, glows when an action is available,
 and its tooltip lists active applications with time left plus the next scored
 picks. Drag to move, right-click for options. When a slot frees up (declined or
 expired application) you get a quiet sound and a glow; when results go stale
@@ -54,11 +57,14 @@ the range with a proxy filter on the leader's best-run level
 - `/jlmp levels <min>-<max>|off` — target key levels (scoring tiebreak + raw-mode filter)
 - `/jlmp sounds on|off`
 - `/jlmp mode blizzard|raw` — search through Blizzard's box or the raw API
+- `/jlmp debug on|off` — troubleshooting log (off wipes it), written to
+  SavedVariables on `/reload`
 
 A keybind mirroring the widget click is under Options → Keybindings → AddOns.
 
 ## Status
 
-Pre-spike. See `SPIKE.md` for the in-game verification task that decides the
-final search path. Applications cannot be auto-cancelled (also protected); they
-expire naturally.
+Working — verified in-game: the Blizzard-box search path retains the typed key
+range with no taint, and applying from the widget works. `SPIKE.md` tracks the
+remaining API assumptions. Applications cannot be auto-cancelled (also
+protected); they expire naturally.
