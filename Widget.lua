@@ -66,7 +66,7 @@ function Widget:Init()
   frame:SetScript("OnClick", function(_, button)
     if button == "RightButton" then
       ns.Config:OpenMenu(frame)
-    elseif IsControlKeyDown() or IsMetaKeyDown() then
+    elseif IsShiftKeyDown() then
       ns.Core:OnUnsignAction()
     else
       ns.Core:OnHardwareAction()
@@ -211,7 +211,7 @@ function Widget:ShowTooltip(owner)
 
   GameTooltip:AddLine(" ")
   GameTooltip:AddLine("Left-click: one action (apply next / search)", 0.5, 0.5, 0.5)
-  GameTooltip:AddLine("Ctrl/Cmd-click: leave oldest application", 0.5, 0.5, 0.5)
+  GameTooltip:AddLine("Shift-click: leave oldest application", 0.5, 0.5, 0.5)
   GameTooltip:AddLine("Right-click: options. Drag to move.", 0.5, 0.5, 0.5)
   GameTooltip:Show()
 end

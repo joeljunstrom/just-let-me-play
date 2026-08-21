@@ -22,7 +22,7 @@ press) does exactly one thing, picked by priority:
 Filling all 5 slots from scratch is a search plus five clicks. Click as fast as
 you like; each click is one action.
 
-Ctrl-click (or Cmd-click) leaves your oldest application, the one you've waited
+Shift-click leaves your oldest application, the one you've waited
 on longest, and blacklists that group for the session. Handy when a leader lets
 you hang and you'd rather chase a fresh group.
 
