@@ -75,11 +75,14 @@ end
 -- C_LFGList.Search and ApplyToGroup are hardware-event protected: this function
 -- must only be reached from a click or keybind call stack, never from a timer
 -- or event handler.
+-- One protected action per click, by priority: drop a dead application,
+-- else apply to the next scored group, else search.
 function Core:OnHardwareAction()
   ns.Debug:Log("action", ("state=%s results=%d free=%d"):format(ns.state, #ns.results, self:FreeSlots()))
-  ns.Apply:CancelDeadApplications()
-  if ns.state == "SEARCHED" and #ns.results > 0 and self:FreeSlots() > 0 then
-    ns.Apply:ApplyTop()
+  if ns.Apply:CancelOneDead() then
+    -- click spent
+  elseif ns.state == "SEARCHED" and #ns.results > 0 and self:FreeSlots() > 0 then
+    ns.Apply:ApplyNext()
   else
     ns.Search:Trigger()
   end

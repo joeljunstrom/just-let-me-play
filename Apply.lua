@@ -28,57 +28,42 @@ end
 -- Cancel applications that can no longer work out: the group delisted or my
 -- role filled up while the leader lets the application hang. CancelApplication
 -- is hardware-event protected, so this runs inside the widget click.
-local LINGERING = {
-  declined = true,
-  declined_full = true,
-  declined_delisted = true,
-  timedout = true,
-  failed = true,
-  invitedeclined = true,
-}
-
-function Apply:CancelDeadApplications()
-  if not ns.db.autoCancel then return end
+-- The server honors only ONE protected LFGList action (apply, cancel, search)
+-- per hardware event; extra calls return fine but silently do nothing. So each
+-- click performs exactly one action. Cancelling declined/timed-out entries
+-- also does nothing (they expire on their own), so only live applications
+-- whose group delisted or filled my role are worth a cancel.
+function Apply:CancelOneDead()
+  if not ns.db.autoCancel then return false end
   for _, id in ipairs(C_LFGList.GetApplications()) do
     local _, appStatus = C_LFGList.GetApplicationInfo(id)
     ns.Debug:Log("apps", ("id=%s status=%s"):format(tostring(id), tostring(appStatus)))
-    local dead = false
-    if LINGERING[appStatus] then
-      dead = true
-    elseif appStatus == "applied" then
+    if appStatus == "applied" then
       local info = C_LFGList.GetSearchResultInfo(id)
-      dead = (info and info.isDelisted) or not ns.Search:RoleHasSpace(id)
-    end
-    if dead then
-      ns.sessionDeclined[id] = true
-      local ok = pcall(C_LFGList.CancelApplication, id)
-      ns.Debug:Log("cancel", ("id=%s status=%s ok=%s"):format(tostring(id), tostring(appStatus), tostring(ok)))
-    end
-  end
-end
-
--- Hardware-event context only: C_LFGList.ApplyToGroup is protected.
-function Apply:ApplyTop()
-  local free = ns.Core:FreeSlots()
-  local tank, healer, dps = roleFlags()
-
-  local remaining = {}
-  for _, id in ipairs(ns.results) do
-    if self:StillEligible(id) then
-      if free > 0 then
-        local ok, err = pcall(C_LFGList.ApplyToGroup, id, tank, healer, dps)
-        ns.Debug:Log("apply", ("id=%s ok=%s%s"):format(tostring(id), tostring(ok), err and (" err=" .. tostring(err)) or ""))
-        if ok then
-          ns.pendingApplies[id] = GetTime()
-        end
-        free = free - 1
-      else
-        remaining[#remaining + 1] = id
+      if (info and info.isDelisted) or not ns.Search:RoleHasSpace(id) then
+        ns.sessionDeclined[id] = true
+        local ok = pcall(C_LFGList.CancelApplication, id)
+        ns.Debug:Log("cancel", ("id=%s ok=%s"):format(tostring(id), tostring(ok)))
+        return true
       end
     end
   end
+  return false
+end
 
-  ns.results = remaining
+function Apply:ApplyNext()
+  local tank, healer, dps = roleFlags()
+  while #ns.results > 0 do
+    local id = table.remove(ns.results, 1)
+    if self:StillEligible(id) then
+      local ok, err = pcall(C_LFGList.ApplyToGroup, id, tank, healer, dps)
+      ns.Debug:Log("apply", ("id=%s ok=%s%s"):format(tostring(id), tostring(ok), err and (" err=" .. tostring(err)) or ""))
+      if ok then
+        ns.pendingApplies[id] = GetTime()
+      end
+      break
+    end
+  end
   if #ns.results == 0 then
     ns.state = "IDLE"
   end

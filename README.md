@@ -1,22 +1,26 @@
 # JustLetMePlay
 
 Low-effort Mythic+ Premade Group Finder queueing for WoW retail. Keeps you topped
-up at the 5-application cap with two clicks instead of babysitting the group browser.
+up at the 5-application cap with a few clicks instead of babysitting the group browser.
 
 ## How it works
 
-Blizzard protects `C_LFGList.Search` and `ApplyToGroup` behind hardware events:
-they only run inside a real click or keypress. Search results also arrive
-asynchronously. So the flow is two clicks on the widget (or two presses of the
-keybind):
+Blizzard protects `C_LFGList.Search`, `ApplyToGroup` and `CancelApplication`
+behind hardware events: they only run inside a real click or keypress, and the
+server honors just one such action per click. So each widget click (or keybind
+press) does exactly one thing, picked by priority:
 
-1. **Click 1: Search.** Triggers a Group Finder search. Results are scored:
+1. **Cancel** an application that can't work out anymore (group delisted, or
+   your role filled while they let you hang).
+2. **Apply** to the next best group from the last search. Results are scored:
    groups that need your role first, then freshest listings, then leader
    best-run level closest to your target range. Already-applied groups, groups
    that declined you, and groups whose invite you declined this session are
    skipped.
-2. **Click 2: Apply.** Applies to the top-scored groups until you have 5
-   active applications.
+3. **Search** when there is nothing left to apply to.
+
+Filling all 5 slots from scratch is a search plus five clicks. Click as fast as
+you like; each click is one action.
 
 The widget stays hidden until you have something to search for: text in
 Blizzard's M+ search box, or dungeons picked with `/jlmp dungeons`. It shows

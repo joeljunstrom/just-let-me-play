@@ -10,6 +10,12 @@ folder; symlink it as `<WoW>/_retail_/Interface/AddOns/JustLetMePlay`.
   **hardware-event protected**: they may only be called inside a click/keypress
   call stack. Never call them from timers or event handlers. The single entry
   point is `Core:OnHardwareAction()` (widget click / keybind).
+- **One protected action per hardware event.** Extra calls in the same click
+  return without error but the server silently drops them (saw it in the debug
+  log: 5 applies sent, only the first ever registered). So each click does
+  exactly one thing: cancel one dead application, or apply to one group, or
+  search. `CancelApplication` on a declined/timed-out entry also no-ops; those
+  expire on their own.
 - `Search` is **async**. Results arrive via `LFG_LIST_SEARCH_RESULTS_RECEIVED`
   (can fire twice per search; deduped by `GetTime()` in Core). One click can
   therefore only search; the next click applies. Hence the two-click flow.

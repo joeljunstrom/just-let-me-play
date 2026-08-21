@@ -135,7 +135,7 @@ function Widget:Refresh()
     frame.label:SetTextColor(0.6, 0.6, 0.6)
     self:SetGlow(false)
   elseif ns.state == "SEARCHED" and #ns.results > 0 and free > 0 then
-    frame.label:SetText(("Apply %d"):format(math.min(free, #ns.results)))
+    frame.label:SetText(("Apply (%d)"):format(math.min(free, #ns.results)))
     frame.label:SetTextColor(0.4, 0.9, 0.45)
     self:SetGlow(true)
   elseif free > 0 then
@@ -197,7 +197,7 @@ function Widget:ShowTooltip(owner)
   end
 
   GameTooltip:AddLine(" ")
-  GameTooltip:AddLine("Left-click: search / apply", 0.5, 0.5, 0.5)
+  GameTooltip:AddLine("Left-click: one action (apply next / search)", 0.5, 0.5, 0.5)
   GameTooltip:AddLine("Right-click: options. Drag to move.", 0.5, 0.5, 0.5)
   GameTooltip:Show()
 end

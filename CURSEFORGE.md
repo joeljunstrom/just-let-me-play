@@ -1,21 +1,22 @@
 # CurseForge listing
 
-**Summary:** Keeps you topped up at 5 Mythic+ applications with two clicks. Stop babysitting the Group Finder.
+**Summary:** Keeps you topped up at 5 Mythic+ applications with a few quick clicks. Stop babysitting the Group Finder.
 
 ---
 
 # JustLetMePlay
 
-Queueing for Mythic+ means staring at the Group Finder: refresh the search, click a group, sign up in the role prompt, over and over as applications expire after 5 minutes or get declined. JustLetMePlay turns that whole loop into two clicks so you can do world content, delves, or auction house errands while you wait.
+Queueing for Mythic+ means staring at the Group Finder: refresh the search, scroll, click a group, sign up in the role prompt, over and over as applications expire after 5 minutes or get declined. JustLetMePlay shrinks that whole loop to a click per action, no window, no scrolling, so you can do world content, delves, or auction house errands while you wait.
 
 ## How it works
 
-A small movable button shows your active applications (`3/5`) and glows when there's something to do:
+A small movable button shows your active applications (`3/5`) and glows when there's something to do. Each click does the one thing that helps most right now:
 
-1. **Click: Search.** Runs a Group Finder search and scores the results: groups that need your role first, then the freshest listings, then leaders whose best run is closest to your target key level. Groups that declined you (or whose invite you declined) are skipped for the session.
-2. **Click: Apply.** Applies to the top-scored groups until you're back at the 5-application cap.
+1. **Cancel** an application that's going nowhere (group delisted or your role filled while they let you hang).
+2. **Apply** to the next best group from the last search. Results are scored: groups that need your role first, then the freshest listings, then leaders whose best run is closest to your target key level. Groups that declined you (or whose invite you declined) are skipped for the session.
+3. **Search** when there's nothing left to apply to.
 
-When a slot frees up (declined or expired) you get a quiet sound and the button glows. Click-click, back to playing. Getting accepted uses Blizzard's normal invite dialog.
+When a slot frees up (declined or expired) you get a quiet sound and the button glows. A few quick clicks, back to playing. Getting accepted uses Blizzard's normal invite dialog.
 
 ## Key level filtering
 
