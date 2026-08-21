@@ -240,12 +240,15 @@ function Widget:ApplySkin()
   -- on a square box, whatever the size.
   local pct = math.min(skin.radius or Widget.DEFAULT_RADIUS, 50)
   local radius = math.floor(math.min(width, height) * pct / 100 + 0.5)
+  -- The border rings the outside of the box rather than eating into it; its
+  -- outer radius grows by the border width to stay concentric.
   local borderWidth = skin.borderWidth or Widget.DEFAULT_BORDER_WIDTH
-  frame.bgShape.inset = borderWidth
-  frame.glowShape.inset = borderWidth
-  frame.borderShape:SetRadius(radius)
-  frame.bgShape:SetRadius(math.max(0, radius - borderWidth))
-  frame.glowShape:SetRadius(math.max(0, radius - borderWidth))
+  frame.borderShape.inset = -borderWidth
+  frame.bgShape.inset = 0
+  frame.glowShape.inset = 0
+  frame.borderShape:SetRadius(radius > 0 and radius + borderWidth or 0)
+  frame.bgShape:SetRadius(radius)
+  frame.glowShape:SetRadius(radius)
 
   local bg = skin.bg or Widget.DEFAULT_BG
   frame.bgShape:SetColor(bg[1], bg[2], bg[3], bg[4])
