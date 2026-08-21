@@ -140,10 +140,14 @@ function Widget:Refresh()
     frame.label:SetText(("Apply (%d)"):format(math.min(free, #ns.results)))
     frame.label:SetTextColor(0.4, 0.9, 0.45)
     self:SetGlow(true)
-  elseif free > 0 then
+  elseif free > 0 and ns.Search:HasSearchContext() then
     frame.label:SetText("Search")
     frame.label:SetTextColor(1, 0.85, 0.3)
     self:SetGlow(true)
+  elseif free > 0 then
+    frame.label:SetText("Set search")
+    frame.label:SetTextColor(0.6, 0.6, 0.6)
+    self:SetGlow(false)
   else
     frame.label:SetText("Queued")
     frame.label:SetTextColor(0.55, 0.55, 0.6)

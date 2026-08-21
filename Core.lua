@@ -85,8 +85,16 @@ function Core:OnHardwareAction()
     -- click spent
   elseif ns.state == "SEARCHED" and #ns.results > 0 and self:FreeSlots() > 0 then
     ns.Apply:ApplyNext()
-  else
+  elseif ns.Search:HasSearchContext() then
     ns.Search:Trigger()
+  else
+    -- Nothing sane to search for (empty box after a /reload, no configured
+    -- dungeons); searching now would apply to random groups. Open the panel
+    -- so the user can type their range instead.
+    if PVEFrame_ToggleFrame then
+      PVEFrame_ToggleFrame("GroupFinderFrame")
+    end
+    print("|cff33ff99JustLetMePlay|r: type your search (e.g. |cffffff7810-12|r) in the Group Finder box first.")
   end
   ns.Widget:Refresh()
   C_Timer.After(6, function() ns.Widget:Refresh() end)

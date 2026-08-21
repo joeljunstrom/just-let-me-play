@@ -25,7 +25,8 @@ function Search:HasSearchContext()
     local text = panel.SearchBox and panel.SearchBox:GetText() or ""
     if text ~= "" then return true end
   end
-  return next(ns.db.activityIDs) ~= nil
+  if next(ns.db.activityIDs) then return true end
+  return not ns.db.useBlizzardSearchBox and ns.db.targetLevelMin ~= nil
 end
 
 local function blizzardPanelUsable()
