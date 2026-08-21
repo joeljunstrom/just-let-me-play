@@ -1,4 +1,4 @@
-# JustLetMePlay — agent quick start
+# JustLetMePlay: agent quick start
 
 Retail WoW addon that keeps you queued for Mythic+ in the Premade Group Finder
 with two clicks instead of constant babysitting. Repo root **is** the addon
@@ -10,38 +10,38 @@ folder; symlink it as `<WoW>/_retail_/Interface/AddOns/JustLetMePlay`.
   **hardware-event protected**: they may only be called inside a click/keypress
   call stack. Never call them from timers or event handlers. The single entry
   point is `Core:OnHardwareAction()` (widget click / keybind).
-- `Search` is **async** — results arrive via `LFG_LIST_SEARCH_RESULTS_RECEIVED`
+- `Search` is **async**. Results arrive via `LFG_LIST_SEARCH_RESULTS_RECEIVED`
   (can fire twice per search; deduped by `GetTime()` in Core). One click can
   therefore only search; the next click applies. Hence the two-click flow.
 - Group **titles/comments are opaque kstrings** (`|Kt…|k`): displayable, never
   parseable. Key levels cannot be read or filtered client-side.
 - **Key-level filtering** rides on Blizzard's search box: text typed there
-  (e.g. `10-12`) is retained when we call `LFGListSearchPanel_DoSearch`
-  (verified in-game, no taint). Fallback path: raw `C_LFGList.Search` +
-  proxy filter on the leader's best-run level.
-- Max **5 active applications** (server rule). Server confirms an application
-  1–3s after `ApplyToGroup`, so `ns.pendingApplies` counts unconfirmed sends —
-  without it rapid clicks over-apply.
+  (e.g. `10-12`) is kept when we call `LFGListSearchPanel_DoSearch` (holds up
+  in-game, no taint). Fallback path: raw `C_LFGList.Search` plus a proxy
+  filter on the leader's best-run level.
+- Max **5 active applications** (server rule). The server confirms an
+  application 1-3s after `ApplyToGroup`, so `ns.pendingApplies` counts
+  unconfirmed sends. Without it rapid clicks over-apply.
 - **Taint rule**: never write to Blizzard `LFGListFrame` state. Read-only
   access, `HookScript` post-hooks, and the `DoSearch` call are fine.
 
 ## Module map (load order in the .toc)
 
-- `Debug.lua` — rolling 300-entry log in SavedVariables (see workflow below)
-- `Core.lua` — event frame, DB init, state machine `IDLE→SEARCHED`,
+- `Debug.lua`: rolling 300-entry log in SavedVariables (see workflow below)
+- `Core.lua`: event frame, DB init, state machine `IDLE→SEARCHED`,
   application/slot accounting, `OnHardwareAction` dispatch
-- `Config.lua` — `/jlmp` slash commands + right-click menu
-- `Search.lua` — search trigger (blizzard/raw path), eligibility, scoring
-  (needs-my-role → age bucket → level proximity), `HasSearchContext`
-- `Apply.lua` — apply-to-top until cap, role flags from spec
-- `Notify.lua` — sounds/pulses (slot freed, stale results)
-- `Widget.lua` — movable button UI; hidden until a search context exists
+- `Config.lua`: `/jlmp` slash commands plus right-click menu
+- `Search.lua`: search trigger (blizzard/raw path), eligibility, scoring
+  (needs-my-role, then age bucket, then level proximity), `HasSearchContext`
+- `Apply.lua`: apply-to-top until cap, role flags from spec
+- `Notify.lua`: sounds/pulses (slot freed, stale results)
+- `Widget.lua`: movable button UI; hidden until a search context exists
 
 State lives on the shared addon namespace `ns` (second vararg of each file).
 
 ## Dev workflow
 
-- No build step. Edit → in-game `/reload` → test. The symlink makes repo edits
+- No build step. Edit, `/reload` in-game, test. The symlink makes repo edits
   live on next reload.
 - Syntax check locally: `luajit -bl <file>.lua` (Lua 5.1 == WoW's dialect).
   Run over every .lua before committing.
@@ -51,12 +51,11 @@ State lives on the shared addon namespace `ns` (second vararg of each file).
   read `<WoW>/_retail_/WTF/Account/<ACCOUNT>/SavedVariables/JustLetMePlay.lua`.
   Log lines: `HH:MM:SS [tag] key=value…` with tags
   `action|search|results|pick|apply|app|debug`.
-- Verified in-game: `LFGListSearchPanel_DoSearch` retains the search-box text
-  taint-free; raw 7-arg `C_LFGList.Search` works; `ApplyToGroup`,
+- Confirmed in-game so far: `LFGListSearchPanel_DoSearch` keeps the search-box
+  text without taint; the raw 7-arg `C_LFGList.Search` works; `ApplyToGroup`,
   `GetApplicationInfo` order, and `leaderDungeonScoreInfo.bestRunLevel` behave
-  as coded. Still unverified: `GetSearchResultMemberCounts` key names
-  (assumed `TANK`/`HEALER`/`DAMAGER`) and whether the slot-freed sound choice
-  is pleasant.
+  as coded. Still open: `GetSearchResultMemberCounts` key names (assumed
+  `TANK`/`HEALER`/`DAMAGER`) and whether the slot-freed sound is pleasant.
 - TOC `## Interface` must track current retail (120100 = 12.1.x); bump when
   the client updates or the addon shows as out of date.
 
@@ -66,3 +65,5 @@ State lives on the shared addon namespace `ns` (second vararg of each file).
   hardware-event/taint rules above).
 - Plain commit messages: no feat:/fix:/docs: prefixes, no AI-attribution
   trailers. Push to `origin main` (github.com/joeljunstrom/just-let-me-play).
+- Docs read like a person wrote them: no em-dash chains, no stiff words like
+  "utilize" or "leverage", no robotic "verified/ensured" phrasing.

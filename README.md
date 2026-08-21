@@ -5,27 +5,27 @@ up at the 5-application cap with two clicks instead of babysitting the group bro
 
 ## How it works
 
-Blizzard protects `C_LFGList.Search` and `ApplyToGroup` behind hardware events —
+Blizzard protects `C_LFGList.Search` and `ApplyToGroup` behind hardware events:
 they only run inside a real click or keypress. Search results also arrive
 asynchronously. So the flow is two clicks on the widget (or two presses of the
 keybind):
 
-1. **Click 1 — Search.** Triggers a Group Finder search. Results are scored:
+1. **Click 1: Search.** Triggers a Group Finder search. Results are scored:
    groups that need your role first, then freshest listings, then leader
    best-run level closest to your target range. Already-applied groups, groups
    that declined you, and groups whose invite you declined this session are
    skipped.
-2. **Click 2 — Apply.** Applies to the top-scored groups until you have 5
+2. **Click 2: Apply.** Applies to the top-scored groups until you have 5
    active applications.
 
-The widget stays hidden until there is something to search for — text in
-Blizzard's M+ search box or dungeons configured via `/jlmp dungeons`. It shows
+The widget stays hidden until you have something to search for: text in
+Blizzard's M+ search box, or dungeons picked with `/jlmp dungeons`. It shows
 `n/5` active applications, glows when an action is available,
 and its tooltip lists active applications with time left plus the next scored
 picks. Drag to move, right-click for options. When a slot frees up (declined or
 expired application) you get a quiet sound and a glow; when results go stale
 while you are below 5, the widget pulses. Accepted invites use Blizzard's own
-dialog — no extra notification.
+dialog, no extra notification.
 
 ## Install
 
@@ -52,12 +52,12 @@ the range with a proxy filter on the leader's best-run level
 
 `/jlmp` in chat:
 
-- `/jlmp dungeons [list|add <id>|remove <id>|clear]` — restrict to specific dungeons
-- `/jlmp role tank|healer|dps|any|auto` — role used when applying (auto = current spec)
-- `/jlmp levels <min>-<max>|off` — target key levels (scoring tiebreak + raw-mode filter)
+- `/jlmp dungeons [list|add <id>|remove <id>|clear]`: restrict to specific dungeons
+- `/jlmp role tank|healer|dps|any|auto`: role used when applying (auto = current spec)
+- `/jlmp levels <min>-<max>|off`: target key levels (scoring tiebreak + raw-mode filter)
 - `/jlmp sounds on|off`
-- `/jlmp mode blizzard|raw` — search through Blizzard's box or the raw API
-- `/jlmp debug on|off` — troubleshooting log (off wipes it), written to
+- `/jlmp mode blizzard|raw`: search through Blizzard's box or the raw API
+- `/jlmp debug on|off`: troubleshooting log (off wipes it), written to
   SavedVariables on `/reload`
 
 A keybind mirroring the widget click is under Options → Keybindings → AddOns.
@@ -72,14 +72,14 @@ A keybind mirroring the widget click is under Options → Keybindings → AddOns
    ```
 
 3. Upload manually on CurseForge: game version = current retail, paste the
-   changelog. Don't use the GitHub-sync option — one pipeline only.
+   changelog. Don't use the GitHub-sync option; one pipeline only.
 
 The zip must contain the `JustLetMePlay/` folder (matching the .toc name), not
-loose files — `git archive` with the prefix handles that. Never zip via Finder;
+loose files. `git archive` with the prefix handles that. Never zip via Finder;
 it adds `__MACOSX`/`._` junk.
 
 ## Status
 
-Working — verified in-game: the Blizzard-box search path retains the typed key
-range with no taint, and applying from the widget works. Applications cannot be
-auto-cancelled (also protected); they expire naturally.
+Works. Tested in-game: searches keep the key range you typed, no taint errors,
+and applications show up in the Blizzard UI as expected. Applications can't be
+auto-cancelled (also protected), they just expire.
