@@ -28,18 +28,31 @@ end
 -- Cancel applications that can no longer work out: the group delisted or my
 -- role filled up while the leader lets the application hang. CancelApplication
 -- is hardware-event protected, so this runs inside the widget click.
+local LINGERING = {
+  declined = true,
+  declined_full = true,
+  declined_delisted = true,
+  timedout = true,
+  failed = true,
+  invitedeclined = true,
+}
+
 function Apply:CancelDeadApplications()
   if not ns.db.autoCancel then return end
   for _, id in ipairs(C_LFGList.GetApplications()) do
     local _, appStatus = C_LFGList.GetApplicationInfo(id)
-    if appStatus == "applied" then
+    ns.Debug:Log("apps", ("id=%s status=%s"):format(tostring(id), tostring(appStatus)))
+    local dead = false
+    if LINGERING[appStatus] then
+      dead = true
+    elseif appStatus == "applied" then
       local info = C_LFGList.GetSearchResultInfo(id)
-      local dead = (info and info.isDelisted) or not ns.Search:RoleHasSpace(id)
-      if dead then
-        ns.sessionDeclined[id] = true
-        local ok = pcall(C_LFGList.CancelApplication, id)
-        ns.Debug:Log("cancel", ("id=%s ok=%s"):format(tostring(id), tostring(ok)))
-      end
+      dead = (info and info.isDelisted) or not ns.Search:RoleHasSpace(id)
+    end
+    if dead then
+      ns.sessionDeclined[id] = true
+      local ok = pcall(C_LFGList.CancelApplication, id)
+      ns.Debug:Log("cancel", ("id=%s status=%s ok=%s"):format(tostring(id), tostring(appStatus), tostring(ok)))
     end
   end
 end
