@@ -6,7 +6,7 @@
 
 # JustLetMePlay
 
-Queueing for Mythic+ means staring at the Group Finder: applications expire after 5 minutes, groups decline you, and every slot you get back has to be refilled by hand. JustLetMePlay turns that into two clicks so you can do world content, delves, or auction house errands while you wait.
+Queueing for Mythic+ means staring at the Group Finder: refresh the search, click a group, sign up in the role prompt — over and over as applications expire after 5 minutes or get declined. JustLetMePlay turns that whole loop into two clicks so you can do world content, delves, or auction house errands while you wait.
 
 ## How it works
 
