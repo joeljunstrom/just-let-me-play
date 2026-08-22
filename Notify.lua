@@ -5,7 +5,7 @@ ns.Notify = Notify
 
 function Notify:SlotFreed()
   if ns.db.sounds then
-    PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON, "Master")
+    PlaySound(SOUNDKIT.READY_CHECK, "Master")
   end
   ns.Widget:Refresh()
   ns.Widget:Pulse()
