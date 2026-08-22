@@ -68,19 +68,21 @@ State lives on the shared addon namespace `ns` (second vararg of each file).
 
 ## Releases
 
-CurseForge auto-pulls from GitHub releases, so a GitHub release with a zip
-asset **is** the release. Cutting one:
+CurseForge packages automatically when a tag is pushed (repo webhook): it
+builds the zip itself from `.pkgmeta` (honors `ignore:`, substitutes
+`@project-version@` in the .toc) and takes the changelog from `CHANGELOG.md`
+(`manual-changelog` in `.pkgmeta`). Without that key it compiles the raw git
+log, author emails included; never remove it. Cutting a release:
 
-1. Commit the work, then annotated tag: `git tag -a vX.Y.Z -m "short summary"`
-   (plain `git tag` fails, the repo wants tag messages). Push branch and tag.
-2. Build the zip: `git archive vX.Y.Z` into a `JustLetMePlay/` staging folder,
-   delete everything under `ignore:` in `.pkgmeta` (plus `.pkgmeta` itself),
-   replace `@project-version@` in the .toc with the tag name, zip the folder.
-   Result: 14 files, top-level `JustLetMePlay/` dir. `Textures/` ships,
-   `logo.png` does not.
-3. `gh release create vX.Y.Z --title vX.Y.Z --notes "..."` with the zip as the
-   asset, named exactly `JustLetMePlay.zip`. Notes are hand-written highlights
-   for players, not a commit log (see v0.5.0 for the tone).
+1. Add a `## vX.Y.Z` entry to `CHANGELOG.md`, player-facing highlights, not a
+   commit log. Commit it with (or after) the work.
+2. Annotated tag: `git tag -a vX.Y.Z -m "short summary"` (plain `git tag`
+   fails, the repo wants tag messages). Push branch and tag; CurseForge takes
+   it from there. A tag name containing "alpha" or "beta" uploads as that
+   release type.
+3. Also cut a GitHub release: `gh release create vX.Y.Z --title vX.Y.Z
+   --notes "..."`, same highlights as the changelog entry. No zip asset
+   needed, CurseForge builds its own.
 
 Commits and tags must use the personal email. Repo-local
 `git config user.email joel.junstrom@gmail.com` is set; never let the global
