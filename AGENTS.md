@@ -61,9 +61,30 @@ State lives on the shared addon namespace `ns` (second vararg of each file).
   text without taint; the raw 7-arg `C_LFGList.Search` works; `ApplyToGroup`,
   `GetApplicationInfo` order, and `leaderDungeonScoreInfo.bestRunLevel` behave
   as coded. Still open: `GetSearchResultMemberCounts` key names (assumed
-  `TANK`/`HEALER`/`DAMAGER`) and whether the slot-freed sound is pleasant.
+  `TANK`/`HEALER`/`DAMAGER`) and whether the slot-freed sound
+  (`SOUNDKIT.READY_CHECK` since v0.5.1) is loud enough without being annoying.
 - TOC `## Interface` must track current retail (120100 = 12.1.x); bump when
   the client updates or the addon shows as out of date.
+
+## Releases
+
+CurseForge auto-pulls from GitHub releases, so a GitHub release with a zip
+asset **is** the release. Cutting one:
+
+1. Commit the work, then annotated tag: `git tag -a vX.Y.Z -m "short summary"`
+   (plain `git tag` fails, the repo wants tag messages). Push branch and tag.
+2. Build the zip: `git archive vX.Y.Z` into a `JustLetMePlay/` staging folder,
+   delete everything under `ignore:` in `.pkgmeta` (plus `.pkgmeta` itself),
+   replace `@project-version@` in the .toc with the tag name, zip the folder.
+   Result: 14 files, top-level `JustLetMePlay/` dir. `Textures/` ships,
+   `logo.png` does not.
+3. `gh release create vX.Y.Z --title vX.Y.Z --notes "..."` with the zip as the
+   asset, named exactly `JustLetMePlay.zip`. Notes are hand-written highlights
+   for players, not a commit log (see v0.5.0 for the tone).
+
+Commits and tags must use the personal email. Repo-local
+`git config user.email joel.junstrom@gmail.com` is set; never let the global
+work address leak in, it ends up in the CurseForge changelog.
 
 ## Conventions
 
