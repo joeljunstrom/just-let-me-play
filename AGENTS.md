@@ -61,8 +61,9 @@ State lives on the shared addon namespace `ns` (second vararg of each file).
   text without taint; the raw 7-arg `C_LFGList.Search` works; `ApplyToGroup`,
   `GetApplicationInfo` order, and `leaderDungeonScoreInfo.bestRunLevel` behave
   as coded. Still open: `GetSearchResultMemberCounts` key names (assumed
-  `TANK`/`HEALER`/`DAMAGER`) and whether the slot-freed sound
-  (`SOUNDKIT.READY_CHECK` since v0.5.1) is loud enough without being annoying.
+  `TANK`/`HEALER`/`DAMAGER`) and which `Notify.SOUNDS` entries
+  feel right in-game (ready check was tried as default and was way too loud;
+  whisper is the default since v0.5.2).
 - TOC `## Interface` must track current retail (120100 = 12.1.x); bump when
   the client updates or the addon shows as out of date.
 

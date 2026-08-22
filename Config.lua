@@ -80,12 +80,33 @@ local function handleLevels(rest)
     ns.db.targetLevelMin, ns.db.targetLevelMax))
 end
 
+local function handleSounds(rest)
+  if rest == "" or rest == "on" or rest == "off" then
+    ns.db.sounds = rest ~= "off"
+    say("Sounds " .. (ns.db.sounds and "on" or "off") .. ".")
+    return
+  end
+  for _, sound in ipairs(ns.Notify.SOUNDS) do
+    if sound.key == rest then
+      ns.db.sound = sound.key
+      ns.Notify:Play()
+      say("Sound: " .. sound.label .. ".")
+      return
+    end
+  end
+  local keys = {}
+  for _, sound in ipairs(ns.Notify.SOUNDS) do
+    keys[#keys + 1] = sound.key
+  end
+  say("Usage: /jlmp sounds on|off|" .. table.concat(keys, "|"))
+end
+
 local function showHelp()
   say("commands:")
   say("/jlmp dungeons [add <id>|remove <id>|clear] - or pick from the right-click menu")
   say("/jlmp role tank|healer|dps|any|auto - role for applications")
   say("/jlmp levels <min>-<max>|off - target key levels")
-  say("/jlmp sounds on|off")
+  say("/jlmp sounds on|off|<sound> - toggle or pick the notification sound")
   say("/jlmp mode blizzard|raw - search via Blizzard's box (keeps typed range) or raw API")
   say("/jlmp show always|auto - keep widget visible, or only with a search/applications")
   say("/jlmp autocancel on|off - drop applications when the group delists or your role fills")
@@ -102,8 +123,7 @@ local function handle(msg)
   elseif cmd == "levels" then
     handleLevels(rest)
   elseif cmd == "sounds" then
-    ns.db.sounds = rest ~= "off"
-    say("Sounds " .. (ns.db.sounds and "on" or "off") .. ".")
+    handleSounds(rest)
   elseif cmd == "show" then
     ns.db.alwaysShow = rest ~= "auto"
     ns.Widget:Refresh()
@@ -159,6 +179,16 @@ function Config:OpenMenu(owner)
     end, function()
       ns.db.sounds = not ns.db.sounds
     end)
+
+    local sound = root:CreateButton("Sound")
+    for _, entry in ipairs(ns.Notify.SOUNDS) do
+      sound:CreateRadio(entry.label, function()
+        return ns.db.sound == entry.key
+      end, function()
+        ns.db.sound = entry.key
+        ns.Notify:Play()
+      end)
+    end
 
     root:CreateCheckbox("Always show widget", function()
       return ns.db.alwaysShow

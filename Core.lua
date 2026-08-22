@@ -19,6 +19,7 @@ ns.joinedGroup = false
 local defaults = {
   activityIDs = {},
   sounds = true,
+  sound = "whisper",
   useBlizzardSearchBox = true,
   debugEnabled = false,
   autoCancel = true,

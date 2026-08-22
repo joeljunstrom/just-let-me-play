@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.5.2
+
+- Pick your notification sound: right-click menu → Sound, or
+  `/jlmp sounds <name>`. Six choices from whisper to raid warning, previewed
+  on select.
+- Saner default: the ready check sound from v0.5.1 was way too much. Default
+  is now the whisper ping.
+
 ## v0.5.1
 
 - Audible notification: the slot-freed sound was the standard checkbox tick,
